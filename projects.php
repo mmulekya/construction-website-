@@ -26,6 +26,7 @@ echo "<p>".$row['description']."</p>";
 echo "<p>Location: ".$row['location']."</p>";
 echo "<p>Budget: ".$row['budget']."</p>";
 echo "<hr>";
+echo "<a href='bid_project.php?project_id=".$row['id']."'>Submit Bid</a>";
 
 }
 
