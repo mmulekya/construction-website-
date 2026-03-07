@@ -1,1 +1,0 @@
-echo "<a href='bid_project.php?project_id=".$row['id']."'>Submit Bid</a>";
