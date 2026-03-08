@@ -25,6 +25,7 @@
 <a href="post_project.php">Post Project</a>
 <a href="projects.php">View Projects</a>
 <a href="ai_estimator.php">AI Cost Estimator</a>
+<a href="ai_planner.php">AI Project Planner</a>
 </nav>
 
 <section>
