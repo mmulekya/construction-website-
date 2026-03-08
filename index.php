@@ -24,7 +24,7 @@
 <a href="constructors.php">Find Constructors</a>
 <a href="post_project.php">Post Project</a>
 <a href="projects.php">View Projects</a>
-
+<a href="ai_estimator.php">AI Cost Estimator</a>
 </nav>
 
 <section>
