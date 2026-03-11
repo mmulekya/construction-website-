@@ -24,4 +24,33 @@ $project = mysqli_fetch_assoc($result);
 Place Bid
 </a>
 
+<h3>Bids for this Project</h3>
+
+<?php
+
+$project_id = $_GET['id'];
+
+$sql = "SELECT bids.*, users.name
+FROM bids
+JOIN users ON bids.constructor_id = users.id
+WHERE project_id='$project_id'";
+
+$result = mysqli_query($conn,$sql);
+
+while($bid = mysqli_fetch_assoc($result)){
+
+?>
+
+<div class="card">
+
+<p><b>Constructor:</b> <?php echo $bid['name']; ?></p>
+
+<p><b>Bid Amount:</b> $<?php echo $bid['amount']; ?></p>
+
+<p><?php echo $bid['proposal']; ?></p>
+
+</div>
+
+<?php } ?>
+
 <?php include("includes/footer.php"); ?>
