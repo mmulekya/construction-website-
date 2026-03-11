@@ -1,31 +1,29 @@
 <?php
-session_start();
-include("config/database.php");
+include("includes/header.php");
+
+if(!isset($_SESSION['user_id'])){
+header("Location: login.php");
+}
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-<title>Post Construction Project</title>
-</head>
-
-<body>
-
-<h2>Post Your Construction Project</h2>
+<h2>Post a Construction Project</h2>
 
 <form action="save_project.php" method="POST">
 
-<input type="text" name="title" placeholder="Project Title" required><br><br>
+<label>Project Title</label>
+<input type="text" name="title" required>
 
-<textarea name="description" placeholder="Describe your project"></textarea><br><br>
+<label>Project Description</label>
+<textarea name="description" required></textarea>
 
-<input type="text" name="location" placeholder="Location"><br><br>
+<label>Location</label>
+<input type="text" name="location" placeholder="City or Country">
 
-<input type="number" name="budget" placeholder="Estimated Budget"><br><br>
+<label>Budget (USD)</label>
+<input type="number" name="budget">
 
 <button type="submit">Post Project</button>
 
 </form>
 
-</body>
-</html>
+<?php include("includes/footer.php"); ?>
