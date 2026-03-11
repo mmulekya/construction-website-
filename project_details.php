@@ -26,6 +26,10 @@ Place Bid
 
 <h3>Bids for this Project</h3>
 
+<a href="chat.php?project_id=<?php echo $project_id; ?>&user=<?php echo $bid['constructor_id']; ?>">
+Chat with Constructor
+</a>
+
 <?php
 
 $project_id = $_GET['id'];
