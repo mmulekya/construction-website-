@@ -1,21 +1,54 @@
 <?php
 
-$type = $_POST['type'];
+include("includes/header.php");
+
 $size = $_POST['size'];
 $floors = $_POST['floors'];
 
-echo "<h2>AI Generated Construction Plan</h2>";
+$total_area = $size * $floors;
 
-echo "<ol>";
+if($total_area < 150){
+$duration = "3 - 4 months";
+}
 
-echo "<li>Site Preparation</li>";
-echo "<li>Foundation Construction</li>";
-echo "<li>Structure Building</li>";
-echo "<li>Roof Installation</li>";
-echo "<li>Electrical & Plumbing</li>";
-echo "<li>Interior Finishing</li>";
-echo "<li>Final Inspection</li>";
+elseif($total_area < 400){
+$duration = "5 - 7 months";
+}
 
-echo "</ol>";
+else{
+$duration = "8 - 12 months";
+}
 
 ?>
+
+<h2>AI Construction Plan</h2>
+
+<p><b>Building Size:</b> <?php echo $size; ?> m²</p>
+
+<p><b>Floors:</b> <?php echo $floors; ?></p>
+
+<p><b>Estimated Duration:</b> <?php echo $duration; ?></p>
+
+<h3>Construction Stages</h3>
+
+<ul>
+
+<li>Site preparation (1 week)</li>
+
+<li>Foundation construction (2 - 3 weeks)</li>
+
+<li>Wall and structure building (4 - 8 weeks)</li>
+
+<li>Roof installation (2 weeks)</li>
+
+<li>Electrical and plumbing installation (2 - 4 weeks)</li>
+
+<li>Interior finishing (4 weeks)</li>
+
+<li>Final inspection and handover</li>
+
+</ul>
+
+<a href="post_project.php">Start Project</a>
+
+<?php include("includes/footer.php"); ?>
