@@ -83,6 +83,10 @@ while($bid = mysqli_fetch_assoc($result)){
 
 </div>
 
+<a href="update_project.php?project_id=<?php echo $project_id; ?>">
+Add Project Update
+</a>
+
 <?php } ?>
 
 <?php include("includes/footer.php"); ?>
