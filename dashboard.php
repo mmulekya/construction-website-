@@ -13,3 +13,4 @@ exit();
 <p>You are logged in to BuildSmart.</p>
 
 <a href="logout.php">Logout</a>
+<a href="add_constructor.php">Create Constructor Profile</a>
