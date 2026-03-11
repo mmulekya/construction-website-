@@ -1,20 +1,17 @@
-<h2>AI Construction Project Planner</h2>
+<?php include("includes/header.php"); ?>
+
+<h2>AI Construction Planner</h2>
 
 <form action="planner_result.php" method="POST">
 
-<label>Building Type</label>
-<select name="type">
-<option>House</option>
-<option>Apartment</option>
-<option>Office</option>
-</select>
-
-<label>Size (m²)</label>
+<label>Building Size (m²)</label>
 <input type="number" name="size" required>
 
-<label>Floors</label>
+<label>Number of Floors</label>
 <input type="number" name="floors" required>
 
-<button type="submit">Generate Plan</button>
+<button type="submit">Generate Construction Plan</button>
 
 </form>
+
+<?php include("includes/footer.php"); ?>
