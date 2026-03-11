@@ -1,6 +1,27 @@
-$sql = "SELECT * FROM project_updates WHERE project_id='$project_id' ORDER BY created_at DESC";
+<?php
+
+include("includes/header.php");
+include("config/database.php");
+
+$id = $_GET['id'];
+
+$sql = "SELECT * FROM projects WHERE id='$id'";
 $result = mysqli_query($conn,$sql);
 
-while($row = mysqli_fetch_assoc($result)){
-echo "<p>".$row['update_text']." <br><small>".$row['created_at']."</small></p>";
-}
+$project = mysqli_fetch_assoc($result);
+
+?>
+
+<h2><?php echo $project['title']; ?></h2>
+
+<p><?php echo $project['description']; ?></p>
+
+<p><b>Location:</b> <?php echo $project['location']; ?></p>
+
+<p><b>Budget:</b> $<?php echo $project['budget']; ?></p>
+
+<a href="bid_project.php?project_id=<?php echo $project['id']; ?>">
+Place Bid
+</a>
+
+<?php include("includes/footer.php"); ?>
