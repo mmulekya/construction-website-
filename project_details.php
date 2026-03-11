@@ -30,6 +30,34 @@ Place Bid
 Chat with Constructor
 </a>
 
+<h3>Project Updates</h3>
+
+<?php
+
+$sql = "SELECT project_updates.*, users.name
+FROM project_updates
+JOIN users ON project_updates.constructor_id = users.id
+WHERE project_id='$project_id'
+ORDER BY created_at DESC";
+
+$result = mysqli_query($conn,$sql);
+
+while($update = mysqli_fetch_assoc($result)){
+
+?>
+
+<div class="card">
+
+<p><b><?php echo $update['name']; ?></b></p>
+
+<p><?php echo $update['update_text']; ?></p>
+
+<p><small><?php echo $update['created_at']; ?></small></p>
+
+</div>
+
+<?php } ?>
+
 <?php
 
 $project_id = $_GET['id'];
