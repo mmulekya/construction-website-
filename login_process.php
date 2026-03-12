@@ -7,6 +7,11 @@ include("config/database.php");
 $email = $_POST['email'];
 $password = $_POST['password'];
 
+$stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
+$stmt->bind_param("s",$email);
+$stmt->execute();
+$result = $stmt->get_result()
+
 $sql = "SELECT * FROM users WHERE email='$email'";
 
 $result = mysqli_query($conn,$sql);
