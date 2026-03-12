@@ -3,6 +3,19 @@
 include("includes/header.php");
 include("config/database.php");
 
+<form method="GET">
+
+<input type="text" name="location" placeholder="Project location">
+
+<input type="number" name="budget" placeholder="Maximum budget">
+
+<button type="submit">Search</button>
+
+</form>
+
+
+
+
 $sql = "SELECT * FROM projects ORDER BY created_at DESC";
 
 $result = mysqli_query($conn,$sql);
