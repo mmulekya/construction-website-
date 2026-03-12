@@ -3,6 +3,8 @@
 <h2>Login</h2>
 
 <form action="login_process.php" method="POST">
+7
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
 
 <label>Email</label>
 <input type="email" name="email" required>
