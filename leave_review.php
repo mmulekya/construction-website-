@@ -14,6 +14,8 @@ $project_id = $_GET['project_id'];
 
 <form action="save_review.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <input type="hidden" name="constructor_id" value="<?php echo $constructor_id; ?>">
 <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 
