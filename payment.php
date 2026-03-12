@@ -14,6 +14,8 @@ $constructor_id = $_GET['constructor_id'];
 
 <form action="process_payment.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 <input type="hidden" name="constructor_id" value="<?php echo $constructor_id; ?>">
 
