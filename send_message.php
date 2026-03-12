@@ -2,6 +2,11 @@
 
 session_start();
 
+if($_POST['token'] !== $_SESSION['token']){
+    die("Invalid request");
+}
+
+
 include("config/database.php");
 
 $sender_id = $_SESSION['user_id'];
@@ -19,6 +24,7 @@ header("Location: chat.php?project_id=".$project_id."&user=".$receiver_id);
 }else{
 
 echo "Message failed";
+echo "Message sent successfully";
 
 }
 
