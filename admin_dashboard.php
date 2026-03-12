@@ -1,18 +1,20 @@
 <?php
-session_start();
+include("includes/header.php");
 include("config/database.php");
 
-if($_SESSION['role'] != 'admin'){
-    echo "Access denied";
-    exit();
+if($_SESSION['role'] != "admin"){
+echo "Access denied";
+exit;
 }
+
 ?>
 
-<h1>Admin Dashboard</h1>
+<h2>Admin Dashboard</h2>
 
-<ul>
-<li><a href="manage_users.php">Manage Users</a></li>
-<li><a href="manage_projects.php">Manage Projects</a></li>
-<li><a href="manage_payments.php">Manage Payments</a></li>
-<li><a href="manage_reviews.php">Manage Reviews</a></li>
-</ul>
+<a href="manage_users.php">Manage Users</a><br><br>
+
+<a href="manage_projects.php">Manage Projects</a><br><br>
+
+<a href="manage_payments.php">Manage Payments</a>
+
+<?php include("includes/footer.php"); ?>
