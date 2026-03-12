@@ -38,6 +38,8 @@ session_start();
 
 <a href="ai_planner.php">AI Planner</a>
 
+<a href="notifications.php">🔔 Notifications</a>
+
 <a href="ai_chat.php">AI Assistant</a>
 
 <?php if(isset($_SESSION['user_id'])) { ?>
