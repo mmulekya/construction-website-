@@ -4,6 +4,8 @@ include("config/database.php");
 
 <form method="GET">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <input type="text" name="city" placeholder="Search by city">
 
 <select name="specialization">
