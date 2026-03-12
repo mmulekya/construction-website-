@@ -4,6 +4,8 @@
 
 <form action="estimate_result.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <label>Building Size (square meters)</label>
 <input type="number" name="size" required>
 
