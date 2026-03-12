@@ -10,6 +10,8 @@ header("Location: login.php");
 
 <form action="save_constructor.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <label>Specialization</label>
 <input type="text" name="specialization" placeholder="e.g Masonry, Electrical">
 
