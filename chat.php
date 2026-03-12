@@ -37,6 +37,8 @@ echo "<p><b>".$msg['name']."</b>: ".$msg['message']."</p>";
 
 <form action="send_message.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 <input type="hidden" name="receiver_id" value="<?php echo $receiver_id; ?>">
 
