@@ -10,6 +10,8 @@ header("Location: login.php");
 
 <form action="save_project.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <label>Project Title</label>
 <input type="text" name="title" required>
 
