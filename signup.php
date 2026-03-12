@@ -4,6 +4,8 @@
 
 <form action="signup_process.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <label>Name</label>
 <input type="text" name="name" required>
 
