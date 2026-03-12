@@ -4,6 +4,8 @@
 
 <form action="planner_result.php" method="POST">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <label>Building Size (m²)</label>
 <input type="number" name="size" required>
 
