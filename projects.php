@@ -5,6 +5,8 @@ include("config/database.php");
 
 <form method="GET">
 
+<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+
 <input type="text" name="location" placeholder="Project location">
 
 <input type="number" name="budget" placeholder="Maximum budget">
