@@ -1,28 +1,23 @@
 <?php
 include("includes/header.php");
-
-if(!isset($_SESSION['user_id'])){
-header("Location: login.php");
-}
+include("includes/auth.php");
 ?>
 
-<h2>Post a Construction Project</h2>
+<h2>Post a New Construction Project</h2>
 
 <form action="save_project.php" method="POST">
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
-
 <label>Project Title</label>
-<input type="text" name="title" required>
+<input type="text" name="title" required maxlength="150">
 
-<label>Project Description</label>
+<label>Description</label>
 <textarea name="description" required></textarea>
 
 <label>Location</label>
-<input type="text" name="location" placeholder="City or Country">
+<input type="text" name="location" required>
 
 <label>Budget (USD)</label>
-<input type="number" name="budget">
+<input type="number" name="budget" required>
 
 <button type="submit">Post Project</button>
 
