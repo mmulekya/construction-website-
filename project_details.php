@@ -89,4 +89,32 @@ Add Project Update
 
 <?php } ?>
 
+<h3>Project Progress</h3>
+
+<?php
+
+$sql = "SELECT * FROM project_progress
+WHERE project_id='$id'
+ORDER BY created_at DESC";
+
+$result = mysqli_query($conn,$sql);
+
+while($row = mysqli_fetch_assoc($result)){
+
+?>
+
+<div class="card">
+
+<h4><?php echo $row['stage']; ?></h4>
+
+<p>Progress: <?php echo $row['progress']; ?>%</p>
+
+<p><?php echo $row['update_text']; ?></p>
+
+<img src="uploads/<?php echo $row['photo']; ?>" width="250">
+
+</div>
+
+<?php } ?>
+
 <?php include("includes/footer.php"); ?>
