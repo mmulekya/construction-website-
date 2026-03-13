@@ -1,0 +1,31 @@
+<?php include("includes/header.php"); ?>
+
+<h2>AI Construction Cost Calculator</h2>
+
+<form action="calculate_cost.php" method="POST">
+
+<label>Building Size (Square Meters)</label>
+<input type="number" name="size" required>
+
+<label>Number of Floors</label>
+<select name="floors">
+<option value="1">1 Floor</option>
+<option value="2">2 Floors</option>
+<option value="3">3 Floors</option>
+</select>
+
+<label>Construction Type</label>
+<select name="type">
+<option value="standard">Standard</option>
+<option value="modern">Modern</option>
+<option value="luxury">Luxury</option>
+</select>
+
+<label>Location</label>
+<input type="text" name="location" placeholder="City or Country">
+
+<button type="submit">Calculate Cost</button>
+
+</form>
+
+<?php include("includes/footer.php"); ?>
