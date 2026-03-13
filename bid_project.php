@@ -1,34 +1,25 @@
 <?php
-
 include("includes/header.php");
-include("config/database.php");
+include("includes/auth.php");
 
-$sql = "SELECT * FROM projects ORDER BY created_at DESC";
-
-$result = mysqli_query($conn,$sql);
-
+$project_id = intval($_GET['id']);
 ?>
 
-<h2>Construction Projects</h2>
+<h2>Submit Bid</h2>
 
-<?php while($row = mysqli_fetch_assoc($result)){ ?>
+<form action="save_bid.php" method="POST">
 
-<div class="card">
+<input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 
-<h3><?php echo $row['title']; ?></h3>
+<label>Bid Amount</label>
+<input type="number" name="amount" required>
 
-<p><?php echo substr($row['description'],0,120); ?>...</p>
+<label>Proposal</label>
+<textarea name="proposal" required></textarea>
 
-<p><b>Location:</b> <?php echo $row['location']; ?></p>
+<button type="submit">Submit Bid</button>
 
-<p><b>Budget:</b> $<?php echo $row['budget']; ?></p>
-
-<a href="project_details.php?id=<?php echo $row['id']; ?>">
-View Details
-</a>
-
-</div>
-
-<?php } ?>
+</form>
 
 <?php include("includes/footer.php"); ?>
+
