@@ -1,19 +1,17 @@
 <?php
-
-session_start();
 include("config/database.php");
+include("includes/auth.php");
 
-$constructor_id = $_GET['constructor_id'];
-$project_id = $_GET['project_id'];
+$bid_id = intval($_GET['bid_id']);
 
-$sql = "UPDATE projects 
-        SET constructor_id='$constructor_id', status='assigned'
-        WHERE id='$project_id'";
+$stmt = $conn->prepare(
+"UPDATE bids SET status='accepted' WHERE id=?"
+);
 
-mysqli_query($conn,$sql);
+$stmt->bind_param("i",$bid_id);
+$stmt->execute();
+$stmt->close();
 
-echo "<h3>Constructor successfully assigned to project!</h3>";
-
-echo "<a href='project_details.php?id=".$project_id."'>Back to Project</a>";
-
+echo "Constructor hired successfully.";
 ?>
+
