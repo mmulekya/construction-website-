@@ -1,25 +1,27 @@
 <?php
 include("includes/header.php");
+include("includes/auth.php");
 include("config/database.php");
 
 $user_id = $_SESSION['user_id'];
 
-$sql = "SELECT * FROM notifications 
-        WHERE user_id='$user_id' 
-        ORDER BY created_at DESC";
+$stmt = $conn->prepare(
+"SELECT * FROM notifications WHERE user_id=? ORDER BY created_at DESC"
+);
 
-$result = mysqli_query($conn,$sql);
+$stmt->bind_param("i",$user_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
 ?>
 
 <h2>Notifications</h2>
 
-<?php while($row = mysqli_fetch_assoc($result)){ ?>
+<?php while($row=$result->fetch_assoc()){ ?>
 
 <div class="card">
 
-<p><?php echo $row['message']; ?></p>
-
-<a href="<?php echo $row['link']; ?>">View</a>
+<p><?php echo htmlspecialchars($row['message']); ?></p>
 
 </div>
 
