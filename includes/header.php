@@ -16,6 +16,15 @@ session_start();
 
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="BuildSmart is an AI powered construction platform that connects clients with professional constructors and provides smart building tools.">
+
+<meta name="keywords" content="construction, contractors, building cost calculator, hire builders, construction AI, building services">
+
+<meta name="author" content="BuildSmart">
+
+<meta name="robots" content="index, follow">
+
 </head>
 
 <body>
