@@ -4,8 +4,6 @@
 
 <form action="login_process.php" method="POST">
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
-
 <label>Email</label>
 <input type="email" name="email" required>
 
