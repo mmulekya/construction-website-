@@ -1,48 +1,49 @@
 <?php
 include("includes/header.php");
+include("includes/auth.php");
 include("config/database.php");
 
-if(!isset($_SESSION['user_id'])){
-header("Location: login.php");
-}
+$receiver_id = intval($_GET['user']);
+$sender_id = $_SESSION['user_id'];
 
-$project_id = $_GET['project_id'];
-$receiver_id = $_GET['user'];
+$stmt = $conn->prepare("
+SELECT messages.*, users.name 
+FROM messages 
+JOIN users ON messages.sender_id = users.id
+WHERE (sender_id=? AND receiver_id=?) 
+OR (sender_id=? AND receiver_id=?)
+ORDER BY created_at ASC
+");
 
+$stmt->bind_param("iiii",$sender_id,$receiver_id,$receiver_id,$sender_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
 ?>
 
-<h2>Project Chat</h2>
+<h2>Chat</h2>
 
 <div class="chat-box">
 
-<?php
+<?php while($msg = $result->fetch_assoc()){ ?>
 
-$sql = "SELECT messages.*, users.name
-FROM messages
-JOIN users ON messages.sender_id = users.id
-WHERE project_id='$project_id'
-ORDER BY created_at ASC";
+<div class="message">
 
-$result = mysqli_query($conn,$sql);
+<strong><?php echo htmlspecialchars($msg['name']); ?>:</strong>
 
-while($msg = mysqli_fetch_assoc($result)){
+<p><?php echo htmlspecialchars($msg['message']); ?></p>
 
-echo "<p><b>".$msg['name']."</b>: ".$msg['message']."</p>";
+</div>
 
-}
-
-?>
+<?php } ?>
 
 </div>
 
 <form action="send_message.php" method="POST">
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
-
-<input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 <input type="hidden" name="receiver_id" value="<?php echo $receiver_id; ?>">
 
-<input type="text" name="message" placeholder="Type your message..." required>
+<textarea name="message" required></textarea>
 
 <button type="submit">Send</button>
 
