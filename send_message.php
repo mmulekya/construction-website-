@@ -1,31 +1,23 @@
 <?php
-
-session_start();
-
-if($_POST['token'] !== $_SESSION['token']){
-    die("Invalid request");
-}
-
-
 include("config/database.php");
+include("includes/auth.php");
+
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
 $sender_id = $_SESSION['user_id'];
-$receiver_id = $_POST['receiver_id'];
-$project_id = $_POST['project_id'];
-$message = $_POST['message'];
+$receiver_id = intval($_POST['receiver_id']);
+$message = htmlspecialchars(trim($_POST['message']));
 
-$sql = "INSERT INTO messages (project_id,sender_id,receiver_id,message)
-VALUES ('$project_id','$sender_id','$receiver_id','$message')";
+$stmt = $conn->prepare(
+"INSERT INTO messages (sender_id,receiver_id,message)
+VALUES (?,?,?)"
+);
 
-if(mysqli_query($conn,$sql)){
+$stmt->bind_param("iis",$sender_id,$receiver_id,$message);
+$stmt->execute();
+$stmt->close();
 
-header("Location: chat.php?project_id=".$project_id."&user=".$receiver_id);
-
-}else{
-
-echo "Message failed";
-echo "Message sent successfully";
+header("Location: chat.php?user=".$receiver_id);
 
 }
-
 ?>
