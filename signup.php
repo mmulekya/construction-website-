@@ -1,27 +1,28 @@
- <?php include("includes/header.php"); ?>
+<?php include("includes/header.php"); ?>
 
 <h2>Create Account</h2>
 
 <form action="signup_process.php" method="POST">
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
-
 <label>Name</label>
-<input type="text" name="name" required>
+<input type="text" name="name" required maxlength="100">
 
 <label>Email</label>
 <input type="email" name="email" required>
 
 <label>Password</label>
-<input type="password" name="password" required>
+<input type="password" name="password" required minlength="6">
 
 <label>Role</label>
+
 <select name="role">
+
 <option value="client">Client</option>
 <option value="constructor">Constructor</option>
+
 </select>
 
-<button type="submit">Signup</button>
+<button type="submit">Sign Up</button>
 
 </form>
 
