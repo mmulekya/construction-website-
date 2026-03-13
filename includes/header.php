@@ -26,9 +26,23 @@ session_start();
 <h2>🏗️ BuildSmart</h2>
 </div>
 
+<nav class="navbar">
 
+<a href="index.php">Home</a>
 
+<a href="projects.php">Projects</a>
 
+<a href="constructors.php">Constructors</a>
+
+<a href="ai_chat.php">AI Assistant</a>
+
+<a href="dashboard.php">Dashboard</a>
+
+<a href="notifications.php">Notifications</a>
+
+<a href="logout.php">Logout</a>
+
+</nav>
 
 
 </header>
