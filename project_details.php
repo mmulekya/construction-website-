@@ -1,158 +1,25 @@
 <?php
-
 include("includes/header.php");
 include("config/database.php");
 
-$id = $_GET['id'];
+$id = intval($_GET['id']);
 
-$sql = "SELECT * FROM projects WHERE id='$id'";
-$result = mysqli_query($conn,$sql);
+$stmt = $conn->prepare("SELECT * FROM projects WHERE id=?");
+$stmt->bind_param("i",$id);
+$stmt->execute();
 
-$project = mysqli_fetch_assoc($result);
-
+$result = $stmt->get_result();
+$project = $result->fetch_assoc();
 ?>
 
-<h2><?php echo $project['title']; ?></h2>
+<h2><?php echo htmlspecialchars($project['title']); ?></h2>
 
-<p><?php echo $project['description']; ?></p>
+<p><?php echo htmlspecialchars($project['description']); ?></p>
 
-<p><b>Location:</b> <?php echo $project['location']; ?></p>
+<p><b>Location:</b> <?php echo htmlspecialchars($project['location']); ?></p>
 
-<p><b>Budget:</b> $<?php echo $project['budget']; ?></p>
+<p><b>Budget:</b> $<?php echo htmlspecialchars($project['budget']); ?></p>
 
-<a href="bid_project.php?project_id=<?php echo $project['id']; ?>">
-Place Bid
-</a>
-
-<h3>Bids for this Project</h3>
-
-<a href="chat.php?project_id=<?php echo $project_id; ?>&user=<?php echo $bid['constructor_id']; ?>">
-Chat with Constructor
-</a>
-
-<h3>Project Updates</h3>
-
-<?php
-
-$sql = "SELECT project_updates.*, users.name
-FROM project_updates
-JOIN users ON project_updates.constructor_id = users.id
-WHERE project_id='$project_id'
-ORDER BY created_at DESC";
-
-$result = mysqli_query($conn,$sql);
-
-while($update = mysqli_fetch_assoc($result)){
-
-?>
-
-<div class="card">
-
-<p><b><?php echo $update['name']; ?></b></p>
-
-<p><?php echo $update['update_text']; ?></p>
-
-<p><small><?php echo $update['created_at']; ?></small></p>
-
-</div>
-
-<?php } ?>
-
-<?php
-
-$project_id = $_GET['id'];
-
-$sql = "SELECT bids.*, users.name
-FROM bids
-JOIN users ON bids.constructor_id = users.id
-WHERE project_id='$project_id'";
-
-$result = mysqli_query($conn,$sql);
-
-while($bid = mysqli_fetch_assoc($result)){
-
-?>
-
-<div class="card">
-
-<p><b>Constructor:</b> <?php echo $bid['name']; ?></p>
-
-<p><b>Bid Amount:</b> $<?php echo $bid['amount']; ?></p>
-
-<p><?php echo $bid['proposal']; ?></p>
-
-</div>
-
-<a href="update_project.php?project_id=<?php echo $project_id; ?>">
-Add Project Update
-</a>
-
-<?php } ?>
-
-<h3>Project Progress</h3>
-
-<?php
-
-$sql = "SELECT * FROM project_progress
-WHERE project_id='$id'
-ORDER BY created_at DESC";
-
-$result = mysqli_query($conn,$sql);
-
-while($row = mysqli_fetch_assoc($result)){
-
-?>
-
-<div class="card">
-
-<h4><?php echo $row['stage']; ?></h4>
-
-<p>Progress: <?php echo $row['progress']; ?>%</p>
-
-<p><?php echo $row['update_text']; ?></p>
-
-<img src="uploads/<?php echo $row['photo']; ?>" width="250">
-
-</div>
-
-<?php } ?>
-
-<h3>Recommended Constructors</h3>
-
-<?php
-
-$project_sql = "SELECT * FROM projects WHERE id='$id'";
-$project_result = mysqli_query($conn,$project_sql);
-$project = mysqli_fetch_assoc($project_result);
-
-$location = $project['location'];
-
-$sql = "SELECT * FROM users 
-        WHERE role='constructor'
-        AND city LIKE '%$location%'
-        ORDER BY experience DESC
-        LIMIT 5";
-
-$result = mysqli_query($conn,$sql);
-
-while($row = mysqli_fetch_assoc($result)){
-
-?>
-
-<div class="card">
-
-<h4><?php echo htmlspecialchars($row['name']); ?></h4>
-
-<p>City: <?php echo htmlspecialchars($row['city']); ?></p>
-
-<p>Specialization: <?php echo htmlspecialchars($row['specialization']); ?></p>
-
-<p>Experience: <?php echo htmlspecialchars($row['experience']); ?> years</p>
-
-<a href="profile.php?id=<?php echo $row['id']; ?>">View Profile</a>
-
-</div>
-
-<?php } ?>
+<a href="bid_project.php?id=<?php echo $project['id']; ?>">Submit Bid</a>
 
 <?php include("includes/footer.php"); ?>
