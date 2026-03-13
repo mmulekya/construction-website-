@@ -1,27 +1,34 @@
 <?php
 include("includes/header.php");
+include("includes/auth.php");
 include("config/database.php");
 
-$client_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 
-$sql = "SELECT payments.*, users.name AS constructor_name
-FROM payments
-JOIN users ON payments.constructor_id = users.id
-WHERE client_id='$client_id'";
+$stmt = $conn->prepare(
+"SELECT * FROM payments WHERE user_id=? ORDER BY id DESC"
+);
 
-$result = mysqli_query($conn,$sql);
+$stmt->bind_param("i",$user_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
 ?>
 
 <h2>Payment History</h2>
 
-<?php while($row = mysqli_fetch_assoc($result)){ ?>
+<?php while($row = $result->fetch_assoc()){ ?>
 
 <div class="card">
-<p><b>Project ID:</b> <?php echo $row['project_id']; ?></p>
-<p><b>Constructor:</b> <?php echo $row['constructor_name']; ?></p>
-<p><b>Amount:</b> $<?php echo $row['amount']; ?></p>
-<p><b>Method:</b> <?php echo $row['method']; ?></p>
-<p><b>Status:</b> <?php echo $row['status']; ?></p>
+
+<p><b>Project ID:</b> <?php echo htmlspecialchars($row['project_id']); ?></p>
+
+<p><b>Amount:</b> $<?php echo htmlspecialchars($row['amount']); ?></p>
+
+<p><b>Method:</b> <?php echo htmlspecialchars($row['method']); ?></p>
+
+<p><b>Status:</b> <?php echo htmlspecialchars($row['status']); ?></p>
+
 </div>
 
 <?php } ?>
