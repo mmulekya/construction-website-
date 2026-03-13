@@ -1,24 +1,29 @@
 <?php
-session_start();
+
 include("config/database.php");
+include("includes/auth.php");
 
-$client_id = $_SESSION['user_id'];
-$project_id = $_POST['project_id'];
-$constructor_id = $_POST['constructor_id'];
-$amount = $_POST['amount'];
-$method = $_POST['method'];
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
-// Simulate successful payment
-$status = "paid";
+$user_id = $_SESSION['user_id'];
+$project_id = intval($_POST['project_id']);
+$amount = floatval($_POST['amount']);
+$method = htmlspecialchars($_POST['method']);
 
-$sql = "INSERT INTO payments (project_id,client_id,constructor_id,amount,method,status)
-VALUES ('$project_id','$client_id','$constructor_id','$amount','$method','$status')";
+$stmt = $conn->prepare(
+"INSERT INTO payments (user_id,project_id,amount,method,status)
+VALUES (?,?,?,?,?)"
+);
 
-if(mysqli_query($conn,$sql)){
-    echo "<h3>Payment Successful!</h3>";
-    echo "<a href='dashboard.php'>Go to Dashboard</a>";
-}else{
-    echo "Payment failed.";
+$status = "completed";
+
+$stmt->bind_param("iidss",$user_id,$project_id,$amount,$method,$status);
+
+$stmt->execute();
+
+$stmt->close();
+
+header("Location: payment_history.php");
+
 }
-
 ?>
