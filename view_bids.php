@@ -1,20 +1,36 @@
 <?php
-
+include("includes/header.php");
+include("includes/auth.php");
 include("config/database.php");
 
-$project_id = $_GET['project_id'];
+$project_id = intval($_GET['id']);
 
-$sql = "SELECT * FROM bids WHERE project_id='$project_id'";
-$result = mysqli_query($conn,$sql);
+$stmt = $conn->prepare(
+"SELECT bids.*, users.name
+FROM bids
+JOIN users ON bids.user_id = users.id
+WHERE project_id=?"
+);
 
-echo "<h2>Bids for this project</h2>";
+$stmt->bind_param("i",$project_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-while($row = mysqli_fetch_assoc($result)){
-
-echo "<p>Price: ".$row['price']."</p>";
-echo "<p>Proposal: ".$row['proposal']."</p>";
-echo "<hr>";
-
-}
-
+while($row = $result->fetch_assoc()){
 ?>
+
+<div class="card">
+
+<h3><?php echo htmlspecialchars($row['name']); ?></h3>
+
+<p>Bid: $<?php echo htmlspecialchars($row['amount']); ?></p>
+
+<p><?php echo htmlspecialchars($row['proposal']); ?></p>
+
+<a href="hire_constructor.php?bid_id=<?php echo $row['id']; ?>">Hire</a>
+
+</div>
+
+<?php } ?>
+
+<?php include("includes/footer.php"); ?>
