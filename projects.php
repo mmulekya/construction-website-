@@ -1,46 +1,29 @@
 <?php
-
 include("includes/header.php");
 include("config/database.php");
+?>
 
-<form method="GET">
+<h2>Available Construction Projects</h2>
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+<?php
 
-<input type="text" name="location" placeholder="Project location">
+$result = $conn->query("SELECT * FROM projects ORDER BY id DESC");
 
-<input type="number" name="budget" placeholder="Maximum budget">
-
-<button type="submit">Search</button>
-
-</form>
-
-
-
-
-$sql = "SELECT * FROM projects ORDER BY created_at DESC";
-
-$result = mysqli_query($conn,$sql);
+while($row = $result->fetch_assoc()){
 
 ?>
 
-<h2>Construction Projects</h2>
-
-<?php while($row = mysqli_fetch_assoc($result)){ ?>
-
 <div class="card">
 
-<h3><?php echo $row['title']; ?></h3>
+<h3><?php echo htmlspecialchars($row['title']); ?></h3>
 
-<p><?php echo substr($row['description'],0,120); ?>...</p>
+<p><?php echo htmlspecialchars($row['description']); ?></p>
 
-<p><b>Location:</b> <?php echo $row['location']; ?></p>
+<p><b>Location:</b> <?php echo htmlspecialchars($row['location']); ?></p>
 
-<p><b>Budget:</b> $<?php echo $row['budget']; ?></p>
+<p><b>Budget:</b> $<?php echo htmlspecialchars($row['budget']); ?></p>
 
-<a href="project_details.php?id=<?php echo $row['id']; ?>">
-View Details
-</a>
+<a href="project_details.php?id=<?php echo $row['id']; ?>">View Details</a>
 
 </div>
 
