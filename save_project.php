@@ -1,26 +1,25 @@
 <?php
-
-session_start();
 include("config/database.php");
+include("includes/auth.php");
 
-$client_id = $_SESSION['user_id'];
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
-$title = $_POST['title'];
-$description = $_POST['description'];
-$location = $_POST['location'];
-$budget = $_POST['budget'];
+$title = htmlspecialchars(trim($_POST['title']));
+$description = htmlspecialchars(trim($_POST['description']));
+$location = htmlspecialchars(trim($_POST['location']));
+$budget = intval($_POST['budget']);
+$user_id = $_SESSION['user_id'];
 
-$sql = "INSERT INTO projects (client_id,title,description,location,budget)
-VALUES ('$client_id','$title','$description','$location','$budget')";
+$stmt = $conn->prepare(
+"INSERT INTO projects (title,description,location,budget,user_id)
+VALUES (?,?,?,?,?)"
+);
 
-if(mysqli_query($conn,$sql)){
+$stmt->bind_param("sssii",$title,$description,$location,$budget,$user_id);
+$stmt->execute();
+$stmt->close();
 
 header("Location: projects.php");
 
-}else{
-
-echo "Error posting project";
-
 }
-
 ?>
