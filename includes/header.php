@@ -1,59 +1,56 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+
+session_set_cookie_params([
+'lifetime' => 0,
+'path' => '/',
+'secure' => false,
+'httponly' => true,
+'samesite' => 'Strict'
+]);
+
 session_start();
+
+}
+
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
 
-<meta charset="UTF-8">
-
 <title>BuildSmart</title>
 
-<link rel="stylesheet" href="assets/css/style.css">
-
-<link rel="manifest" href="manifest.json">
-
-
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="description" content="BuildSmart is an AI powered construction platform that connects clients with professional constructors and provides smart building tools.">
-
-<meta name="keywords" content="construction, contractors, building cost calculator, hire builders, construction AI, building services">
-
-<meta name="author" content="BuildSmart">
-
-<meta name="robots" content="index, follow">
+<link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-<header>
-
-<div class="logo">
-<h2>🏗️ BuildSmart</h2>
-</div>
-
 <nav class="navbar">
 
 <a href="index.php">Home</a>
-
 <a href="projects.php">Projects</a>
-
 <a href="constructors.php">Constructors</a>
-
 <a href="ai_chat.php">AI Assistant</a>
+<a href="blog.php">Knowledge Hub</a>
+
+<?php if(isset($_SESSION['user_id'])): ?>
 
 <a href="dashboard.php">Dashboard</a>
-
-<a href="notifications.php">Notifications</a>
-
 <a href="logout.php">Logout</a>
 
+<?php else: ?>
+
+<a href="login.php">Login</a>
+<a href="signup.php">Sign Up</a>
+
+<?php endif; ?>
+
 </nav>
-
-
-</header>
 
 <div class="container">
