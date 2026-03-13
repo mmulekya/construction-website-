@@ -1,20 +1,20 @@
 <?php
 
 session_start();
-
-include("config/database.php");
+require "config/database.php";
 
 $email = $_POST['email'];
 $password = $_POST['password'];
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
+$stmt = $conn->prepare("SELECT id,name,password,role FROM users WHERE email=?");
+
 $stmt->bind_param("s",$email);
+
 $stmt->execute();
-$result = $stmt->get_result()
 
-$result = mysqli_query($conn,$sql);
+$result = $stmt->get_result();
 
-$user = mysqli_fetch_assoc($result);
+$user = $result->fetch_assoc();
 
 if($user && password_verify($password,$user['password'])){
 
