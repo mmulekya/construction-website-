@@ -1,27 +1,26 @@
 <?php
 
-session_start();
-
 include("config/database.php");
+include("includes/auth.php");
 
-$client_id = $_SESSION['user_id'];
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
-$constructor_id = $_POST['constructor_id'];
-$project_id = $_POST['project_id'];
-$rating = $_POST['rating'];
-$review = $_POST['review'];
+$user_id = $_SESSION['user_id'];
+$constructor_id = intval($_POST['constructor_id']);
+$rating = intval($_POST['rating']);
+$review = htmlspecialchars(trim($_POST['review']));
 
-$sql = "INSERT INTO reviews (constructor_id,client_id,project_id,rating,review)
-VALUES ('$constructor_id','$client_id','$project_id','$rating','$review')";
+$stmt = $conn->prepare(
+"INSERT INTO reviews (user_id,constructor_id,rating,review)
+VALUES (?,?,?,?)"
+);
 
-if(mysqli_query($conn,$sql)){
+$stmt->bind_param("iiis",$user_id,$constructor_id,$rating,$review);
 
-header("Location: constructors.php");
+$stmt->execute();
+$stmt->close();
 
-}else{
-
-echo "Review failed";
+header("Location: profile.php?id=".$constructor_id);
 
 }
-
 ?>
