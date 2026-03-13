@@ -117,4 +117,42 @@ while($row = mysqli_fetch_assoc($result)){
 
 <?php } ?>
 
+<h3>Recommended Constructors</h3>
+
+<?php
+
+$project_sql = "SELECT * FROM projects WHERE id='$id'";
+$project_result = mysqli_query($conn,$project_sql);
+$project = mysqli_fetch_assoc($project_result);
+
+$location = $project['location'];
+
+$sql = "SELECT * FROM users 
+        WHERE role='constructor'
+        AND city LIKE '%$location%'
+        ORDER BY experience DESC
+        LIMIT 5";
+
+$result = mysqli_query($conn,$sql);
+
+while($row = mysqli_fetch_assoc($result)){
+
+?>
+
+<div class="card">
+
+<h4><?php echo htmlspecialchars($row['name']); ?></h4>
+
+<p>City: <?php echo htmlspecialchars($row['city']); ?></p>
+
+<p>Specialization: <?php echo htmlspecialchars($row['specialization']); ?></p>
+
+<p>Experience: <?php echo htmlspecialchars($row['experience']); ?> years</p>
+
+<a href="profile.php?id=<?php echo $row['id']; ?>">View Profile</a>
+
+</div>
+
+<?php } ?>
+
 <?php include("includes/footer.php"); ?>
