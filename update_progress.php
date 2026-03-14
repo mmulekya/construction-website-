@@ -1,8 +1,8 @@
 <?php
 include("includes/header.php");
-include("config/database.php");
+include("includes/auth.php");
 
-$project_id = $_GET['project_id'];
+$project_id = intval($_GET['project_id']);
 ?>
 
 <h2>Update Project Progress</h2>
@@ -11,25 +11,19 @@ $project_id = $_GET['project_id'];
 
 <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
 
-<label>Project Stage</label>
-<select name="stage">
-<option value="Foundation">Foundation</option>
-<option value="Walls">Walls</option>
-<option value="Roofing">Roofing</option>
-<option value="Finishing">Finishing</option>
-<option value="Completed">Completed</option>
-</select>
+<label>Construction Stage</label>
+<input type="text" name="stage" required>
 
-<label>Progress (%)</label>
-<input type="number" name="progress" max="100">
+<label>Progress Percentage</label>
+<input type="number" name="progress" min="0" max="100" required>
 
 <label>Update Description</label>
-<textarea name="update_text"></textarea>
+<textarea name="description" required></textarea>
 
-<label>Upload Progress Photo</label>
-<input type="file" name="photo">
+<label>Upload Site Photo</label>
+<input type="file" name="photo" accept="image/*">
 
-<button type="submit">Update Progress</button>
+<button type="submit">Save Update</button>
 
 </form>
 
