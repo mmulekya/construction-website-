@@ -1,11 +1,11 @@
 </div>
-
 <footer>
-
-<p>© <?php echo date("Y"); ?> BuildSmart Platform</p>
-
+<p>© 2026 BuildSmart</p>
+<a href="blog.php">Blog</a>
+<a href="portfolio.php">Portfolio</a>
+<a href="contact.php">Contact</a>
+<a href="privacy.php">Privacy Policy</a>
 </footer>
-
 <script>
 
 if ('serviceWorker' in navigator) {
