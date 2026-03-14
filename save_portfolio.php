@@ -10,6 +10,34 @@ $user_id = $_SESSION['user_id'];
 $title = htmlspecialchars(trim($_POST['title']));
 $description = htmlspecialchars(trim($_POST['description']));
 
+
+
+$max_size = 2 * 1024 * 1024; // 2MB
+
+$image = $_FILES['image']['name'];
+$tmp = $_FILES['image']['tmp_name'];
+$size = $_FILES['image']['size'];
+
+$allowed = ["jpg","jpeg","png","gif"];
+
+$ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+
+if(!in_array($ext,$allowed)){
+die("Invalid file type.");
+}
+
+if($size > $max_size){
+die("File too large.");
+}
+
+$new_name = time()."_".$image;
+
+move_uploaded_file($tmp,"uploads/".$new_name);
+
+
+
+
+
 $image = $_FILES['image']['name'];
 $tmp = $_FILES['image']['tmp_name'];
 
