@@ -2,6 +2,7 @@
 include("includes/header.php");
 include("includes/auth.php");
 include("config/database.php");
+include("includes/security.php");
 ?>
 
 <h2>Add New Blog Post</h2>
