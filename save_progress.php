@@ -1,26 +1,47 @@
 <?php
 
-session_start();
 include("config/database.php");
+include("includes/auth.php");
 
-$project_id = $_POST['project_id'];
-$stage = $_POST['stage'];
-$progress = $_POST['progress'];
-$update_text = $_POST['update_text'];
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
-$photo = $_FILES['photo']['name'];
+$project_id = intval($_POST['project_id']);
+$stage = htmlspecialchars(trim($_POST['stage']));
+$progress = intval($_POST['progress']);
+$description = htmlspecialchars(trim($_POST['description']));
 
-if($photo != ""){
-move_uploaded_file($_FILES['photo']['tmp_name'], "uploads/".$photo);
+$photo_name = "";
+
+if(!empty($_FILES['photo']['name'])){
+
+$image = $_FILES['photo']['name'];
+$tmp = $_FILES['photo']['tmp_name'];
+
+$allowed = ["jpg","jpeg","png","gif"];
+$ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+
+if(!in_array($ext,$allowed)){
+die("Invalid image format");
 }
 
-$sql = "INSERT INTO project_progress
-(project_id,stage,progress,update_text,photo)
-VALUES
-('$project_id','$stage','$progress','$update_text','$photo')";
+$photo_name = time()."_".$image;
 
-mysqli_query($conn,$sql);
+move_uploaded_file($tmp,"uploads/".$photo_name);
 
-header("Location: project_details.php?id=".$project_id);
+}
 
+$stmt = $conn->prepare(
+"INSERT INTO project_progress 
+(project_id,stage,progress,description,photo)
+VALUES (?,?,?,?,?)"
+);
+
+$stmt->bind_param("isiss",$project_id,$stage,$progress,$description,$photo_name);
+
+$stmt->execute();
+$stmt->close();
+
+header("Location: project_progress.php?project_id=".$project_id);
+
+}
 ?>
