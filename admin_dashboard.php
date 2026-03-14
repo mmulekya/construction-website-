@@ -1,20 +1,23 @@
 <?php
 include("includes/header.php");
 include("config/database.php");
+include("includes/auth.php");
 
 if($_SESSION['role'] != "admin"){
-echo "Access denied";
-exit;
+die("Access denied");
 }
-
 ?>
 
-<h2>Admin Dashboard</h2>
+<h2>BuildSmart Admin Dashboard</h2>
 
-<a href="manage_users.php">Manage Users</a><br><br>
+<ul>
 
-<a href="manage_projects.php">Manage Projects</a><br><br>
+<li><a href="manage_users.php">Manage Users</a></li>
 
-<a href="manage_payments.php">Manage Payments</a>
+<li><a href="manage_projects.php">Manage Projects</a></li>
+
+<li><a href="manage_reviews.php">Manage Reviews</a></li>
+
+</ul>
 
 <?php include("includes/footer.php"); ?>
