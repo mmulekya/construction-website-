@@ -24,13 +24,13 @@
 <h1>BuildSmart</h1>
 
 <nav>
-
 <a href="index.php">Home</a>
 <a href="projects.php">Projects</a>
 <a href="constructors.php">Constructors</a>
-<a href="ai_chat.php">AI Assistant</a>
-<a href="login.php">Login</a>
-
+<a href="ai_estimator.php">AI Tools</a>
+<a href="dashboard.php">Dashboard</a>
+<a href="profile.php">Profile</a>
+<a href="logout.php">Logout</a>
 </nav>
 
 </header>
