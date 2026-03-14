@@ -27,6 +27,7 @@
 <a href="index.php">Home</a>
 <a href="projects.php">Projects</a>
 <a href="constructors.php">Constructors</a>
+<a href="ai_budget_predictor.php">AI Budget Predictor</a>
 <a href="ai_estimator.php">AI Tools</a>
 <a href="ai_project_advisor.php">AI Project Advisor</a>
 <a href="dashboard.php">Dashboard</a>
