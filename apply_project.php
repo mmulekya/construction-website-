@@ -1,5 +1,6 @@
 <?php
-include("includes/security.php");
+require_once "includes/security.php";
+require_constructor();
 include("includes/header.php");
 include("config/database.php");
 
