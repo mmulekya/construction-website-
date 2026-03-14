@@ -1,35 +1,30 @@
 <?php
+include("includes/header.php");
 
-$question = strtolower($_POST['question']);
+$question = htmlspecialchars(trim($_POST['question']));
 
-if(strpos($question,"foundation") !== false){
+$answer = "Sorry, I cannot answer that yet.";
 
-echo "A strong foundation usually uses reinforced concrete and should cure for at least 7 days.";
-
+if(stripos($question,"foundation")!==false){
+$answer = "A strong foundation is critical. Common types include strip foundations and raft foundations depending on soil conditions.";
 }
 
-elseif(strpos($question,"roof") !== false){
-
-echo "Roofing installation typically takes 1 to 2 weeks depending on the structure and materials.";
-
+elseif(stripos($question,"cement")!==false){
+$answer = "Cement is used for concrete. The typical mix ratio for structural concrete is 1:2:4 (cement:sand:aggregate).";
 }
 
-elseif(strpos($question,"cost") !== false){
-
-echo "Construction cost depends on location, materials, and labor. Use our AI Cost Estimator for a more accurate estimate.";
-
-}
-
-elseif(strpos($question,"materials") !== false){
-
-echo "Common construction materials include cement, steel reinforcement bars, bricks, sand, and aggregates.";
-
-}
-
-else{
-
-echo "That is a great construction question. For detailed advice consult a professional constructor on this platform.";
-
+elseif(stripos($question,"cost")!==false){
+$answer = "Construction costs depend on location, materials, and design. Use our AI Cost Calculator for an estimate.";
 }
 
 ?>
+
+<h2>Your Question</h2>
+<p><?php echo $question; ?></p>
+
+<h2>AI Answer</h2>
+<p><?php echo $answer; ?></p>
+
+<a href="ai_chat.php">Ask Another Question</a>
+
+<?php include("includes/footer.php"); ?>
