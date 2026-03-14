@@ -11,7 +11,7 @@
 <input type="email" name="email" required>
 
 <label>Password</label>
-<input type="password" name="password" required minlength="6">
+<input type="password" name="password" required minlength="8">
 
 <label>Role</label>
 
