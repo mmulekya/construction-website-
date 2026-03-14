@@ -43,6 +43,13 @@ $stmt->close();
 
 <p><b>Posted By:</b> <?php echo htmlspecialchars($project['client_name']); ?> (<?php echo htmlspecialchars($project['client_country']); ?>)</p>
 
+/* Add below budget display */
+<p><b>Project Status:</b> <?php echo htmlspecialchars($project['status']); ?></p>
+
+<?php if($_SESSION['role'] === 'constructor'): ?>
+    <a href="update_progress.php?project_id=<?php echo $project['id']; ?>">Update Progress</a>
+<?php endif; ?>
+
 <!-- Placeholder for future constructor assignment or messaging -->
 <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'constructor'): ?>
     <a href="apply_project.php?id=<?php echo $project['id']; ?>">Apply to this Project</a>
