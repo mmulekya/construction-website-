@@ -1,50 +1,78 @@
 <?php
+include("includes/security.php");
 include("includes/header.php");
 include("config/database.php");
 
+$country = isset($_GET['country']) ? sanitize($_GET['country']) : "";
+
+?>
+
+<h2>Find Constructors</h2>
+
 <form method="GET">
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+<select name="country">
 
-<input type="text" name="city" placeholder="Search by city">
+<option value="">All Countries</option>
 
-<select name="specialization">
-<option value="">All Specializations</option>
-<option value="architect">Architect</option>
-<option value="engineer">Engineer</option>
-<option value="builder">Builder</option>
-<option value="contractor">Contractor</option>
+<option value="Kenya">Kenya</option>
+<option value="Tanzania">Tanzania</option>
+<option value="Uganda">Uganda</option>
+<option value="Rwanda">Rwanda</option>
+<option value="USA">USA</option>
+<option value="UK">UK</option>
+<option value="India">India</option>
+
 </select>
 
 <button type="submit">Search</button>
 
 </form>
 
-$sql = "SELECT users.name, constructors.specialization, constructors.experience, constructors.city, constructors.bio
-FROM constructors
-JOIN users ON constructors.user_id = users.id";
+<?php
 
-$result = mysqli_query($conn,$sql);
+if($country != ""){
+
+$stmt = $conn->prepare(
+"SELECT id,name,country FROM users
+WHERE role='constructor' AND country=?"
+);
+
+$stmt->bind_param("s",$country);
+
+}else{
+
+$stmt = $conn->prepare(
+"SELECT id,name,country FROM users
+WHERE role='constructor'"
+);
+
+}
+
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+while($row = $result->fetch_assoc()){
+
 ?>
-
-<h2>Available Constructors</h2>
-
-<?php while($row = mysqli_fetch_assoc($result)) { ?>
 
 <div class="card">
 
-<h3><?php echo $row['name']; ?></h3>
+<h3><?php echo htmlspecialchars($row['name']); ?></h3>
 
-<p><b>Specialization:</b> <?php echo $row['specialization']; ?></p>
+<p>Country: <?php echo htmlspecialchars($row['country']); ?></p>
 
-<p><b>Experience:</b> <?php echo $row['experience']; ?> years</p>
-
-<p><b>City:</b> <?php echo $row['city']; ?></p>
-
-<p><?php echo $row['bio']; ?></p>
+<a href="profile.php?id=<?php echo $row['id']; ?>">
+View Profile
+</a>
 
 </div>
 
-<?php } ?>
+<?php
+}
 
-<?php include("includes/footer.php"); ?>
+$stmt->close();
+
+include("includes/footer.php");
+?>
