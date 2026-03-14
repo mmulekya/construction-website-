@@ -1,3 +1,5 @@
+Options -Indexes
+
 RewriteEngine On
 
 RewriteRule ^projects$ projects.php [L]
@@ -5,3 +7,18 @@ RewriteRule ^constructors$ constructors.php [L]
 RewriteRule ^ai$ ai_chat.php [L]
 RewriteRule ^login$ login.php [L]
 RewriteRule ^register$ register.php [L]
+
+<FilesMatch "\.(env|ini|log|sh)$">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+<Files config/database.php>
+Order allow,deny
+Deny from all
+</Files>
+
+<FilesMatch "\.(htaccess|htpasswd)$">
+Order allow,deny
+Deny from all
+</FilesMatch>
