@@ -1,21 +1,42 @@
 <?php
-session_start();
+
 include("config/database.php");
+include("includes/auth.php");
+
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
 $user_id = $_SESSION['user_id'];
 
-$title = $_POST['title'];
-$description = $_POST['description'];
+$title = htmlspecialchars(trim($_POST['title']));
+$description = htmlspecialchars(trim($_POST['description']));
 
 $image = $_FILES['image']['name'];
+$tmp = $_FILES['image']['tmp_name'];
 
-move_uploaded_file($_FILES['image']['tmp_name'], "uploads/".$image);
+$allowed = ["jpg","jpeg","png","gif"];
 
-$sql = "INSERT INTO portfolios (user_id,title,description,image)
-VALUES ('$user_id','$title','$description','$image')";
+$ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
 
-mysqli_query($conn,$sql);
+if(!in_array($ext,$allowed)){
+die("Invalid image format");
+}
 
-header("Location: profile.php");
+$new_name = time()."_".$image;
 
+move_uploaded_file($tmp,"uploads/".$new_name);
+
+$stmt = $conn->prepare(
+"INSERT INTO portfolios (user_id,title,description,image)
+VALUES (?,?,?,?)"
+);
+
+$stmt->bind_param("isss",$user_id,$title,$description,$new_name);
+
+$stmt->execute();
+$stmt->close();
+
+header("Location: portfolio.php");
+
+}
 ?>
+
