@@ -2,6 +2,8 @@
 include("includes/header.php");
 include("includes/auth.php");
 include("config/database.php");
+require_once "includes/security.php";
+require_login();
 
 $project_id = intval($_GET['project_id']);
 ?>
