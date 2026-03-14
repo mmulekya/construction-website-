@@ -1,43 +1,17 @@
-<?php include("includes/header.php"); ?>
+<?php
+include("includes/header.php");
+?>
 
-<h2>AI Construction Assistant</h2>
+<h2>BuildSmart AI Assistant</h2>
 
-<div id="chat-box" style="border:1px solid #ccc; padding:15px; height:300px; overflow:auto;">
-<p><b>AI:</b> Hello! Ask me anything about construction.</p>
-</div>
+<p>Ask anything about building, materials, or construction planning.</p>
 
-<input type="text" id="question" placeholder="Ask a construction question..." style="width:80%;">
-<button onclick="askAI()">Send</button>
+<form action="ai_response.php" method="POST">
 
-<script>
+<input type="text" name="question" placeholder="Example: How much does it cost to build a 3 bedroom house?" required>
 
-function askAI(){
+<button type="submit">Ask AI</button>
 
-let question = document.getElementById("question").value;
-
-fetch("ai_response.php",{
-
-method:"POST",
-headers:{'Content-Type':'application/x-www-form-urlencoded'},
-body:"question="+question
-
-})
-
-.then(response=>response.text())
-
-.then(data=>{
-
-let chatBox = document.getElementById("chat-box");
-
-chatBox.innerHTML += "<p><b>You:</b> "+question+"</p>";
-chatBox.innerHTML += "<p><b>AI:</b> "+data+"</p>";
-
-document.getElementById("question").value="";
-
-});
-
-}
-
-</script>
+</form>
 
 <?php include("includes/footer.php"); ?>
