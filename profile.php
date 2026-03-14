@@ -2,6 +2,8 @@
 
 include("includes/header.php");
 include("config/database.php");
+require_once "includes/security.php";
+require_login();
 
 $id = $_GET['id'] ?? $_SESSION['user_id'];
 
