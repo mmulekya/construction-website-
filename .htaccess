@@ -13,6 +13,47 @@ Order allow,deny
 Deny from all
 </FilesMatch>
 
+
+
+# Disable directory browsing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "(config\.php|database\.php|\.env|composer\.json)">
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+# Block access to includes and config folders
+RewriteEngine On
+RewriteRule ^config/ - [F,L]
+RewriteRule ^includes/ - [F,L]
+
+# Prevent script injection in URL
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [OR]
+RewriteCond %{QUERY_STRING} (\.\./|\.\.\\) [NC]
+RewriteRule .* - [F]
+
+# Block common bots
+RewriteCond %{HTTP_USER_AGENT} (curl|wget|python|nikto|sqlmap) [NC]
+RewriteRule .* - [F,L]
+
+# Prevent access to hidden files
+<Files ~ "^\.">
+Order allow,deny
+Deny from all
+</Files>
+
+# Force HTTPS if SSL is active
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Protect XMLRPC (rarely needed)
+<Files xmlrpc.php>
+Order Deny,Allow
+Deny from all
+</Files>
 <Files config/database.php>
 Order allow,deny
 Deny from all
