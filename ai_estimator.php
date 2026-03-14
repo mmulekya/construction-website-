@@ -1,26 +1,31 @@
-<?php include("includes/header.php"); ?>
+<?php
+include("includes/header.php");
 
-<h2>AI Construction Cost Estimator</h2>
+$size = intval($_POST['size']);
+$floors = intval($_POST['floors']);
+$quality = htmlspecialchars($_POST['quality']);
 
-<form action="estimate_result.php" method="POST">
+$cost_per_m2 = 500;
 
-<input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
+if($quality=="medium"){
+$cost_per_m2 = 800;
+}
 
-<label>Building Size (square meters)</label>
-<input type="number" name="size" required>
+if($quality=="luxury"){
+$cost_per_m2 = 1200;
+}
 
-<label>Number of Floors</label>
-<input type="number" name="floors" required>
+$total_cost = $size * $floors * $cost_per_m2;
+?>
 
-<label>Construction Quality</label>
-<select name="quality">
-<option value="basic">Basic</option>
-<option value="standard">Standard</option>
-<option value="luxury">Luxury</option>
-</select>
+<h2>Estimated Construction Cost</h2>
 
-<button type="submit">Estimate Cost</button>
+<p>House Size: <?php echo $size; ?> m²</p>
+<p>Floors: <?php echo $floors; ?></p>
+<p>Quality: <?php echo $quality; ?></p>
 
-</form>
+<h3>Total Estimated Cost: $<?php echo number_format($total_cost); ?></h3>
+
+<a href="ai_cost_calculator.php">Calculate Again</a>
 
 <?php include("includes/footer.php"); ?>
