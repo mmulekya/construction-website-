@@ -1,41 +1,54 @@
 <?php
+include("includes/security.php");
 include("includes/header.php");
 include("config/database.php");
 
-$project_id = intval($_GET['project_id']);
+// Only logged-in clients can post projects
+if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client'){
+    die("Access denied. Only clients can post projects.");
+}
 
-$stmt = $conn->prepare(
-"SELECT * FROM project_progress 
-WHERE project_id=? 
-ORDER BY id DESC"
-);
+// Handle form submission
+if($_SERVER["REQUEST_METHOD"] === "POST"){
 
-$stmt->bind_param("i",$project_id);
-$stmt->execute();
+    $title = sanitize($_POST['title']);
+    $description = sanitize($_POST['description']);
+    $location = sanitize($_POST['location']);
+    $budget = floatval($_POST['budget']); // ensure numeric
+    $user_id = $_SESSION['user_id'];
 
-$result = $stmt->get_result();
+    // Prepare and execute insert
+    $stmt = $conn->prepare(
+        "INSERT INTO projects (title, description, location, budget, user_id) 
+        VALUES (?, ?, ?, ?, ?)"
+    );
+    $stmt->bind_param("sssdi", $title, $description, $location, $budget, $user_id);
+    $stmt->execute();
+    $stmt->close();
+
+    $success_message = "Project posted successfully!";
+}
 ?>
 
-<h2>Project Progress</h2>
+<h2>Post a New Construction Project</h2>
 
-<?php while($row = $result->fetch_assoc()){ ?>
+<?php if(isset($success_message)) echo "<p class='success'>".htmlspecialchars($success_message)."</p>"; ?>
 
-<div class="card">
+<form method="POST">
 
-<h3><?php echo htmlspecialchars($row['stage']); ?></h3>
+    <label>Project Title</label>
+    <input type="text" name="title" required>
 
-<p><b>Progress:</b> <?php echo htmlspecialchars($row['progress']); ?>%</p>
+    <label>Project Description</label>
+    <textarea name="description" required></textarea>
 
-<p><?php echo htmlspecialchars($row['description']); ?></p>
+    <label>Project Location</label>
+    <input type="text" name="location" required value="<?php echo htmlspecialchars($_SESSION['country']); ?>">
 
-<?php if($row['photo']!=""){ ?>
+    <label>Project Budget (USD)</label>
+    <input type="number" name="budget" step="0.01" required>
 
-<img src="uploads/<?php echo htmlspecialchars($row['photo']); ?>" width="300">
-
-<?php } ?>
-
-</div>
-
-<?php } ?>
+    <button type="submit">Post Project</button>
+</form>
 
 <?php include("includes/footer.php"); ?>
