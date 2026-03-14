@@ -1,0 +1,7 @@
+RewriteEngine On
+
+RewriteRule ^projects$ projects.php [L]
+RewriteRule ^constructors$ constructors.php [L]
+RewriteRule ^ai$ ai_chat.php [L]
+RewriteRule ^login$ login.php [L]
+RewriteRule ^register$ register.php [L]
