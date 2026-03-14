@@ -1,0 +1,28 @@
+<?php
+
+// Start session safely
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Prevent session hijacking
+if (!isset($_SESSION['initiated'])) {
+    session_regenerate_id(true);
+    $_SESSION['initiated'] = true;
+}
+
+// Block suspicious user agents
+$blocked_agents = ["sqlmap","nikto","curl","wget"];
+
+foreach ($blocked_agents as $agent) {
+    if (stripos($_SERVER['HTTP_USER_AGENT'], $agent) !== false) {
+        die("Access denied.");
+    }
+}
+
+// Simple request validation
+function sanitize($data){
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
+
+?>
