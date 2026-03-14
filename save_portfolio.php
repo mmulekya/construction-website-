@@ -3,16 +3,17 @@
 include("config/database.php");
 include("includes/auth.php");
 
-if($_SERVER["REQUEST_METHOD"]=="POST"){
+if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 $user_id = $_SESSION['user_id'];
 
 $title = htmlspecialchars(trim($_POST['title']));
 $description = htmlspecialchars(trim($_POST['description']));
 
+$max_size = 2 * 1024 * 1024; // 2MB limit
 
-
-$max_size = 2 * 1024 * 1024; // 2MB
+/* check if file exists */
+if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
 
 $image = $_FILES['image']['name'];
 $tmp = $_FILES['image']['tmp_name'];
@@ -22,36 +23,21 @@ $allowed = ["jpg","jpeg","png","gif"];
 
 $ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
 
+/* check extension */
 if(!in_array($ext,$allowed)){
 die("Invalid file type.");
 }
 
+/* check size */
 if($size > $max_size){
 die("File too large.");
 }
 
-$new_name = time()."_".$image;
+/* create safe file name */
+$new_name = time() . "_" . preg_replace("/[^a-zA-Z0-9.]/","",$image);
 
-move_uploaded_file($tmp,"uploads/".$new_name);
-
-
-
-
-
-$image = $_FILES['image']['name'];
-$tmp = $_FILES['image']['tmp_name'];
-
-$allowed = ["jpg","jpeg","png","gif"];
-
-$ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
-
-if(!in_array($ext,$allowed)){
-die("Invalid image format");
-}
-
-$new_name = time()."_".$image;
-
-move_uploaded_file($tmp,"uploads/".$new_name);
+/* move file */
+if(move_uploaded_file($tmp,"uploads/".$new_name)){
 
 $stmt = $conn->prepare(
 "INSERT INTO portfolios (user_id,title,description,image)
@@ -64,7 +50,19 @@ $stmt->execute();
 $stmt->close();
 
 header("Location: portfolio.php");
+exit();
+
+}else{
+
+die("Upload failed.");
+
+}
+
+}else{
+
+die("No image uploaded.");
+
+}
 
 }
 ?>
-
