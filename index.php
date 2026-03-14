@@ -1,85 +1,56 @@
-<?php include("includes/header.php"); ?>
+<?php
+include("includes/security.php");
+include("includes/header.php");
+?>
 
-<section style="text-align:center;padding:60px;background:#f5f5f5;">
+<section class="hero">
 
-<h1>BuildSmart – AI Powered Construction Platform</h1>
+<h2>Find Trusted Constructors Worldwide</h2>
 
-<p>Connect with professional constructors and use AI tools to plan your building project.</p>
+<p>BuildSmart connects clients with professional constructors, AI construction planning, and project tracking.</p>
 
-<br>
+<a href="projects.php" class="btn">Post a Project</a>
 
-<a href="register.php" style="padding:12px 25px;background:#007BFF;color:white;text-decoration:none;">Get Started</a>
-
-<a href="projects.php" style="padding:12px 25px;background:#28a745;color:white;text-decoration:none;">Browse Projects</a>
-
-</section>
-
-
-<section style="padding:40px;text-align:center;">
-
-<h2>Our Features</h2>
-
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:30px;">
-
-<div class="card">
-<h3>AI Cost Calculator</h3>
-<p>Estimate your construction cost instantly.</p>
-</div>
-
-<div class="card">
-<h3>Find Constructors</h3>
-<p>Hire professional builders and engineers.</p>
-</div>
-
-<div class="card">
-<h3>Project Tracking</h3>
-<p>Track your construction progress online.</p>
-</div>
-
-<div class="card">
-<h3>Portfolio System</h3>
-<p>View constructors previous projects.</p>
-</div>
-
-</div>
+<a href="constructors.php" class="btn">Find Constructors</a>
 
 </section>
 
 
-<section style="background:#f9f9f9;padding:40px;text-align:center;">
+<section class="features">
 
-<h2>How BuildSmart Works</h2>
+<h2>Why Use BuildSmart?</h2>
 
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:30px;">
+<div class="feature">
 
-<div class="card">
-<h3>1. Post Your Project</h3>
-<p>Describe the construction work you need.</p>
+<h3>AI Construction Assistant</h3>
+<p>Ask questions and get building advice instantly.</p>
+
 </div>
 
-<div class="card">
-<h3>2. Receive Bids</h3>
-<p>Professional constructors send offers.</p>
+<div class="feature">
+
+<h3>Hire Trusted Constructors</h3>
+<p>Find experienced builders and review their portfolios.</p>
+
 </div>
 
-<div class="card">
-<h3>3. Start Construction</h3>
-<p>Hire the best constructor and track progress.</p>
-</div>
+<div class="feature">
+
+<h3>Track Your Project</h3>
+<p>Monitor construction progress with real-time updates.</p>
 
 </div>
 
 </section>
 
 
-<section style="text-align:center;padding:50px;">
+<section class="cta">
 
-<h2>Start Your Construction Journey Today</h2>
+<h2>Start Your Construction Project Today</h2>
 
-<br>
-
-<a href="register.php" style="padding:15px 30px;background:#007BFF;color:white;text-decoration:none;">Create Account</a>
+<a href="register.php" class="btn">Create Free Account</a>
 
 </section>
 
 <?php include("includes/footer.php"); ?>
+
