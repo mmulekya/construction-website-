@@ -1,26 +1,41 @@
 <?php
 include("includes/header.php");
-include("includes/auth.php");
+include("config/database.php");
+
+$project_id = intval($_GET['project_id']);
+
+$stmt = $conn->prepare(
+"SELECT * FROM project_progress 
+WHERE project_id=? 
+ORDER BY id DESC"
+);
+
+$stmt->bind_param("i",$project_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
 ?>
 
-<h2>Post a New Construction Project</h2>
+<h2>Project Progress</h2>
 
-<form action="save_project.php" method="POST">
+<?php while($row = $result->fetch_assoc()){ ?>
 
-<label>Project Title</label>
-<input type="text" name="title" required maxlength="150">
+<div class="card">
 
-<label>Description</label>
-<textarea name="description" required></textarea>
+<h3><?php echo htmlspecialchars($row['stage']); ?></h3>
 
-<label>Location</label>
-<input type="text" name="location" required>
+<p><b>Progress:</b> <?php echo htmlspecialchars($row['progress']); ?>%</p>
 
-<label>Budget (USD)</label>
-<input type="number" name="budget" required>
+<p><?php echo htmlspecialchars($row['description']); ?></p>
 
-<button type="submit">Post Project</button>
+<?php if($row['photo']!=""){ ?>
 
-</form>
+<img src="uploads/<?php echo htmlspecialchars($row['photo']); ?>" width="300">
+
+<?php } ?>
+
+</div>
+
+<?php } ?>
 
 <?php include("includes/footer.php"); ?>
