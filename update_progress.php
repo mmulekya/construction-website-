@@ -1,30 +1,47 @@
 <?php
+include("includes/security.php");
 include("includes/header.php");
-include("includes/auth.php");
+include("config/database.php");
 
-$project_id = intval($_GET['project_id']);
+// Only constructors can update
+if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'constructor'){
+    die("Access denied. Only constructors can update progress.");
+}
+
+$project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
+
+// Handle update
+if($_SERVER["REQUEST_METHOD"] === "POST"){
+    $status = sanitize($_POST['status']);
+
+    $stmt = $conn->prepare("UPDATE projects SET status=? WHERE id=?");
+    $stmt->bind_param("si", $status, $project_id);
+    $stmt->execute();
+    $stmt->close();
+
+    echo "<p>Status updated successfully!</p>";
+}
+
+// Fetch project details
+$stmt = $conn->prepare("SELECT title, status FROM projects WHERE id=?");
+$stmt->bind_param("i", $project_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$project = $result->fetch_assoc();
+$stmt->close();
 ?>
 
-<h2>Update Project Progress</h2>
+<h2>Update Project Progress: <?php echo htmlspecialchars($project['title']); ?></h2>
 
-<form action="save_progress.php" method="POST" enctype="multipart/form-data">
-
-<input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-
-<label>Construction Stage</label>
-<input type="text" name="stage" required>
-
-<label>Progress Percentage</label>
-<input type="number" name="progress" min="0" max="100" required>
-
-<label>Update Description</label>
-<textarea name="description" required></textarea>
-
-<label>Upload Site Photo</label>
-<input type="file" name="photo" accept="image/*">
-
-<button type="submit">Save Update</button>
-
+<form method="POST">
+    <label>Current Status: <?php echo htmlspecialchars($project['status']); ?></label>
+    <select name="status" required>
+        <option value="Pending" <?php if($project['status']=="Pending") echo "selected"; ?>>Pending</option>
+        <option value="In Progress" <?php if($project['status']=="In Progress") echo "selected"; ?>>In Progress</option>
+        <option value="Completed" <?php if($project['status']=="Completed") echo "selected"; ?>>Completed</option>
+        <option value="Cancelled" <?php if($project['status']=="Cancelled") echo "selected"; ?>>Cancelled</option>
+    </select>
+    <button type="submit">Update Status</button>
 </form>
 
 <?php include("includes/footer.php"); ?>
