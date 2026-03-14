@@ -2,6 +2,8 @@
 
 include("includes/header.php");
 include("includes/auth.php");
+require_once "includes/security.php";
+require_login();
 
 ?>
 
