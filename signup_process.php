@@ -1,30 +1,29 @@
 <?php
 
-require "config/database.php";
+include("includes/security.php");
+include("config/database.php");
 
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
-$name = htmlspecialchars(trim($_POST['name']));
-$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-$password = $_POST['password'];
-$role = $_POST['role'];
+$name = sanitize($_POST['name']);
+$email = sanitize($_POST['email']);
+$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+$role = sanitize($_POST['role']);
+$country = sanitize($_POST['country']);
 
-if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-die("Invalid email");
-}
+$stmt = $conn->prepare(
+"INSERT INTO users (name,email,password,role,country)
+VALUES (?,?,?,?,?)"
+);
 
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-$stmt = $conn->prepare("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)");
-
-$stmt->bind_param("ssss",$name,$email,$hashed_password,$role);
+$stmt->bind_param("sssss",$name,$email,$password,$role,$country);
 
 $stmt->execute();
 
 $stmt->close();
 
 header("Location: login.php");
+exit();
 
 }
-
 ?>
