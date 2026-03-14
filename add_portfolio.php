@@ -1,8 +1,6 @@
 <?php
 include("includes/header.php");
-include("config/database.php");
-
-$user_id = $_SESSION['user_id'];
+include("includes/auth.php");
 ?>
 
 <h2>Add Portfolio Project</h2>
@@ -16,11 +14,10 @@ $user_id = $_SESSION['user_id'];
 <textarea name="description" required></textarea>
 
 <label>Project Image</label>
-<input type="file" name="image" required>
+<input type="file" name="image" accept="image/*" required>
 
 <button type="submit">Upload Project</button>
 
 </form>
 
 <?php include("includes/footer.php"); ?>
-
