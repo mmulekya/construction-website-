@@ -1,61 +1,36 @@
 <?php
 
-include("includes/security.php");
-include("config/database.php");
-
-if($_SERVER["REQUEST_METHOD"]=="POST"){
+require_once "includes/security.php";
+require_once "includes/bruteforce_protection.php";
 
 $email = sanitize($_POST['email']);
 $password = $_POST['password'];
 
-/* LOGIN RATE LIMIT */
-
-if(!isset($_SESSION['login_attempts'])){
-$_SESSION['login_attempts'] = 0;
-}
-
-if($_SESSION['login_attempts'] >= 5){
-die("Too many login attempts. Please wait and try again.");
-}
-
-/* CHECK USER */
-
-$stmt = $conn->prepare("SELECT id,password,role FROM users WHERE email=?");
-
+$stmt = $conn->prepare("SELECT id,password FROM users WHERE email=?");
 $stmt->bind_param("s",$email);
 $stmt->execute();
-
 $result = $stmt->get_result();
 
-if($result->num_rows === 1){
+if($user = $result->fetch_assoc()){
 
-$user = $result->fetch_assoc();
+    if(password_verify($password,$user['password'])){
 
-if(password_verify($password,$user['password'])){
+        reset_login_attempts(); // success
+        $_SESSION['user_id']=$user['id'];
+        header("Location: dashboard.php");
+        exit();
 
-$_SESSION['user_id'] = $user['id'];
-$_SESSION['role'] = $user['role'];
+    } else {
 
-$_SESSION['login_attempts'] = 0;
+        record_failed_login();
+        echo "Invalid login.";
 
-header("Location: index.php");
-exit();
-
-}else{
-
-$_SESSION['login_attempts']++;
-echo "Incorrect password.";
-
-}
+    }
 
 }else{
 
-$_SESSION['login_attempts']++;
-echo "User not found.";
+    record_failed_login();
+    echo "Invalid login.";
 
 }
-
-$stmt->close();
-
-}
-?> 
+?>
