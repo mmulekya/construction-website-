@@ -1,4 +1,6 @@
 <?php
+require_once "includes/security.php";
+require_client();
 include("config/database.php");
 include("includes/auth.php");
 
