@@ -2,6 +2,8 @@
 include("includes/header.php");
 include("config/database.php");
 include("includes/auth.php");
+require_once "includes/security.php";
+require_admin();
 
 if($_SESSION['role'] != "admin"){
 die("Access denied");
