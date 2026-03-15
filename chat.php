@@ -1,46 +1,67 @@
 <?php
-include("includes/security.php");
+require_once "includes/security.php";
 require_login();
-include("config/database.php");
+include("includes/header.php");
 
-$project_id=intval($_GET['project_id'] ?? 0);
-$other_user_id=intval($_GET['user_id'] ?? 0);
-
-// Fetch messages
-$stmt=$conn->prepare("SELECT m.*, u.name AS sender_name FROM messages m JOIN users u ON m.sender_id=u.id WHERE m.project_id=? AND (m.sender_id=? OR m.receiver_id=?) ORDER BY m.created_at ASC");
-$user_id=$_SESSION['user_id'];
-$stmt->bind_param("iii",$project_id,$user_id,$user_id);
-$stmt->execute();
-$result=$stmt->get_result();
+$receiver_id = intval($_GET['user_id']);
 ?>
 
-<div id="chatBox">
-<?php while($msg=$result->fetch_assoc()){ ?>
-<p><b><?php echo htmlspecialchars($msg['sender_name']); ?>:</b> <?php echo htmlspecialchars($msg['message']); ?></p>
-<?php } ?>
-</div>
+<h2>Chat</h2>
 
-<form id="chatForm">
-<input type="text" id="msgInput" required>
-<button>Send</button>
+<div id="chat-box" style="border:1px solid #ccc;height:300px;overflow-y:scroll;padding:10px;"></div>
+
+<form id="chat-form">
+
+<input type="hidden" id="receiver_id" value="<?php echo $receiver_id; ?>">
+
+<input type="text" id="message" placeholder="Type message..." required>
+
+<button type="submit">Send</button>
+
 </form>
 
 <script>
-const chatForm=document.getElementById('chatForm');
-const chatBox=document.getElementById('chatBox');
 
-chatForm.addEventListener('submit', async e=>{
-    e.preventDefault();
-    const message=document.getElementById('msgInput').value;
-    const response=await fetch('chat_ajax.php',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({project_id:<?php echo $project_id; ?>,user_id:<?php echo $other_user_id; ?>,message:message})
-    });
-    const data=await response.json();
-    if(data.status==='success'){
-        chatBox.innerHTML+=`<p><b>You:</b> ${message}</p>`;
-        document.getElementById('msgInput').value='';
-    }
+function loadMessages(){
+
+let receiver=document.getElementById("receiver_id").value;
+
+fetch("fetch_messages.php?receiver_id="+receiver)
+.then(res=>res.text())
+.then(data=>{
+document.getElementById("chat-box").innerHTML=data;
 });
+
+}
+
+setInterval(loadMessages,2000); // refresh every 2 seconds
+
+document.getElementById("chat-form").addEventListener("submit",function(e){
+
+e.preventDefault();
+
+let msg=document.getElementById("message").value;
+let receiver=document.getElementById("receiver_id").value;
+
+fetch("send_message.php",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/x-www-form-urlencoded"
+},
+
+body:"message="+encodeURIComponent(msg)+"&receiver_id="+receiver
+
+}).then(()=>{
+document.getElementById("message").value="";
+loadMessages();
+});
+
+});
+
+loadMessages();
+
 </script>
+
+<?php include("includes/footer.php"); ?>
