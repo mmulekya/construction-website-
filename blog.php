@@ -1,4 +1,6 @@
 <?php
+include("includes/security.php");
+require_login(); // Blocks direct access if not logged in
 include("includes/header.php");
 include("includes/auth.php");
 include("config/database.php");
