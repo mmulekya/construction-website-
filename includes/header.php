@@ -35,4 +35,10 @@
 <a href="logout.php">Logout</a>
 </nav>
 
+<form action="search.php" method="GET" style="display:inline;">
+<input type="text" name="q" placeholder="Search..." required>
+<button type="submit">🔎</button>
+</form>
+
+
 </header>
