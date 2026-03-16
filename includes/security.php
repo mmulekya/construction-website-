@@ -1,33 +1,31 @@
 <?php
-// Start secure session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* -------------------------
-SESSION SECURITY
-------------------------- */
-
-// Regenerate session ID periodically
-if (!isset($_SESSION['created'])) {
-    $_SESSION['created'] = time();
-} else if (time() - $_SESSION['created'] > 1800) {
+/* Regenerate session ID once */
+if (!isset($_SESSION['initiated'])) {
     session_regenerate_id(true);
-    $_SESSION['created'] = time();
+    $_SESSION['initiated'] = true;
 }
 
-/* -------------------------
-INPUT SANITIZATION
-------------------------- */
-
-function sanitize($data) {
-    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+/* Bind session to IP and browser */
+if (!isset($_SESSION['user_ip'])) {
+    $_SESSION['user_ip'] = $_SERVER['REMOTE_ADDR'];
+    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 }
 
-/* -------------------------
-LOGIN PROTECTION
-------------------------- */
+if (
+    $_SESSION['user_ip'] !== $_SERVER['REMOTE_ADDR'] ||
+    $_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']
+) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
 
+/* Require login */
 function require_login() {
     if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
@@ -35,75 +33,18 @@ function require_login() {
     }
 }
 
-/* -------------------------
-ADMIN PROTECTION
-------------------------- */
-
-function require_admin() {
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-        header("Location: index.php");
-        exit();
-    }
+/* Check login status */
+function is_logged_in() {
+    return isset($_SESSION['user_id']);
 }
 
-/* -------------------------
-CONSTRUCTOR PROTECTION
-------------------------- */
-
-function require_constructor() {
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'constructor') {
-        header("Location: index.php");
-        exit();
-    }
-}
-
-/* -------------------------
-CLIENT PROTECTION
-------------------------- */
-
-function require_client() {
-    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'client') {
-        header("Location: index.php");
-        exit();
-    }
-}
-
-/* -------------------------
-CSRF TOKEN PROTECTION
-------------------------- */
-
-function generate_csrf_token() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-}
-
-function validate_csrf_token($token) {
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
-        die("Invalid CSRF token.");
-    }
-}
-
-/* -------------------------
-BASIC BOT PROTECTION
-------------------------- */
-
-$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-
-$blocked_agents = ['curl', 'wget', 'python', 'bot'];
-
-foreach ($blocked_agents as $agent) {
-    if (stripos($user_agent, $agent) !== false) {
-        die("Access denied.");
-    }
-}
-
-/* -------------------------
-OUTPUT ESCAPE
-------------------------- */
-
+/* Escape output (XSS protection) */
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 
+/* Clean input */
+function clean_input($data){
+    return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
+}
 ?>
