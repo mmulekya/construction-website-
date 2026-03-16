@@ -9,7 +9,6 @@ $success = "";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-/* Verify CSRF token */
 if(!verify_csrf($_POST['csrf_token'])){
 die("Invalid CSRF token");
 }
@@ -19,12 +18,11 @@ $email = clean_input($_POST['email']);
 $password = $_POST['password'];
 $role = clean_input($_POST['role']);
 
-/* Validate email */
 if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
 $error = "Invalid email address.";
 }
 
-/* Check if email already exists */
+/* Check existing email */
 $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
 $stmt->bind_param("s",$email);
 $stmt->execute();
@@ -38,17 +36,40 @@ $stmt->close();
 
 if(empty($error)){
 
-/* Hash password */
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+/* Create verification token */
+$token = bin2hex(random_bytes(32));
+
 $stmt = $conn->prepare(
-"INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)"
+"INSERT INTO users (name,email,password,role,verification_token,is_verified)
+VALUES (?,?,?,?,?,0)"
 );
 
-$stmt->bind_param("ssss",$name,$email,$hashed_password,$role);
+$stmt->bind_param("sssss",$name,$email,$hashed_password,$role,$token);
 
 if($stmt->execute()){
-$success = "Account created successfully. You can now login.";
+
+$verify_link = "https://yourdomain.com/verify.php?token=".$token;
+
+$subject = "Verify your BuildSmart account";
+
+$message = "
+Hello $name,
+
+Please verify your account by clicking the link below:
+
+$verify_link
+
+If you did not register, ignore this email.
+";
+
+$headers = "From: no-reply@yourdomain.com";
+
+mail($email,$subject,$message,$headers);
+
+$success = "Account created! Check your email to verify your account.";
+
 }else{
 $error = "Registration failed.";
 }
