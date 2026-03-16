@@ -1,88 +1,55 @@
 <?php
-require_once "includes/security.php";
-require_login();
 include("config/database.php");
-include("includes/header.php");
+include("includes/security.php");
+include("includes/csrf.php");
+
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
+}
 
 $user_id = $_SESSION['user_id'];
 
-/* Get user projects */
-$stmt = $conn->prepare("SELECT title,budget,status FROM projects WHERE user_id=?");
+$stmt = $conn->prepare("SELECT name,email,role FROM users WHERE id=?");
 $stmt->bind_param("i",$user_id);
 $stmt->execute();
 $result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$stmt->close();
+
+// Fetch user projects
+$stmt = $conn->prepare("SELECT * FROM projects WHERE user_id=? ORDER BY id DESC");
+$stmt->bind_param("i",$user_id);
+$stmt->execute();
+$projects_result = $stmt->get_result();
+$projects = [];
+while($row = $projects_result->fetch_assoc()){
+    $projects[] = $row;
+}
+$stmt->close();
 
 ?>
+
+<?php include("includes/header.php"); ?>
 
 <h2>Dashboard</h2>
 
-<h3>Welcome to BuildSmart</h3>
-
-<p>Your AI-powered construction platform.</p>
-
-<hr>
+<p>Welcome, <?php echo e($user['name']); ?> (<?php echo e($user['role']); ?>)</p>
 
 <h3>Your Projects</h3>
 
-<?php
-
-if($result->num_rows>0){
-
-while($row=$result->fetch_assoc()){
-
-echo "<div class='card'>";
-
-echo "<h4>".e($row['title'])."</h4>";
-
-echo "<p>Budget: $".e($row['budget'])."</p>";
-
-echo "<p>Status: ".e($row['status'])."</p>";
-
-echo "</div>";
-
-}
-
-}else{
-
-echo "<p>No projects yet.</p>";
-
-}
-
-?>
-
-<hr>
-
-<h3>AI Quick Tools</h3>
-
+<?php if(count($projects) == 0){ ?>
+<p>You have not posted any projects yet.</p>
+<?php } else { ?>
 <ul>
-<li><a href="ai_estimator.php">AI Cost Estimator</a></li>
-<li><a href="ai_planner.php">AI Project Planner</a></li>
-<li><a href="ai_cost_calculator.php">AI Cost Calculator</a></li>
-<li><a href="ai_project_advisor.php">AI Project Advisor</a></li>
-<li><a href="ai_budget_predictor.php">AI Budget Predictor</a></li>
-<li><a href="ai_risk_detector.php">AI Risk Detector</a></li>
+<?php foreach($projects as $proj){ ?>
+<li>
+<a href="project_details.php?id=<?php echo $proj['id']; ?>"><?php echo e($proj['title']); ?></a>
+</li>
+<?php } ?>
 </ul>
+<?php } ?>
 
-<hr>
-
-<h3>Recommended Constructors</h3>
-
-<?php
-
-$cons = $conn->query("SELECT name,location FROM constructors LIMIT 3");
-
-while($c=$cons->fetch_assoc()){
-
-echo "<div class='card'>";
-
-echo "<p><b>".e($c['name'])."</b></p>";
-
-echo "<p>".e($c['location'])."</p>";
-
-echo "</div>";
-
-}
-
-?>
+<p><a href="post_projects.php">Post a New Project</a></p>
 
 <?php include("includes/footer.php"); ?>
