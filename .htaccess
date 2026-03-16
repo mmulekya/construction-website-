@@ -1,65 +1,59 @@
-Options -Indexes
-
-RewriteEngine On
-
-RewriteRule ^projects$ projects.php [L]
-RewriteRule ^constructors$ constructors.php [L]
-RewriteRule ^ai$ ai_chat.php [L]
-RewriteRule ^login$ login.php [L]
-RewriteRule ^register$ register.php [L]
-
-<FilesMatch "\.(env|ini|log|sh)$">
-Order allow,deny
-Deny from all
-</FilesMatch>
-
-
-
 # Disable directory browsing
 Options -Indexes
 
 # Protect sensitive files
-<FilesMatch "(config\.php|database\.php|\.env|composer\.json)">
-Order Allow,Deny
+<FilesMatch "(^\.|\.env|composer\.(json|lock)|package\.json)">
+Order allow,deny
 Deny from all
 </FilesMatch>
 
-# Block access to includes and config folders
+# Protect includes folder
 RewriteEngine On
-RewriteRule ^config/ - [F,L]
 RewriteRule ^includes/ - [F,L]
 
-# Prevent script injection in URL
+# Block access to config files
+<FilesMatch "(config\.php|database\.php)">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+# Prevent SQL injection attempts
 RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
-RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [OR]
-RewriteCond %{QUERY_STRING} (\.\./|\.\.\\) [NC]
-RewriteRule .* - [F]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+RewriteRule ^(.*)$ - [F,L]
 
-# Block common bots
-RewriteCond %{HTTP_USER_AGENT} (curl|wget|python|nikto|sqlmap) [NC]
-RewriteRule .* - [F,L]
+# Block common exploit scans
+RewriteCond %{REQUEST_URI} (eval\(|base64_encode|union.*select|select.*from|insert.*into|drop.*table) [NC]
+RewriteRule ^(.*)$ - [F,L]
 
-# Prevent access to hidden files
-<Files ~ "^\.">
+# Block suspicious user agents
+RewriteCond %{HTTP_USER_AGENT} (sqlmap|curl|wget|nikto|fimap|nmap) [NC]
+RewriteRule ^(.*)$ - [F,L]
+
+# Protect against clickjacking
+Header always set X-Frame-Options SAMEORIGIN
+
+# Prevent MIME sniffing
+Header set X-Content-Type-Options nosniff
+
+# Enable XSS protection
+Header set X-XSS-Protection "1; mode=block"
+
+# Referrer policy
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Disable server signature
+ServerSignature Off
+
+# Protect .htaccess itself
+<Files .htaccess>
 Order allow,deny
 Deny from all
 </Files>
 
-# Force HTTPS if SSL is active
-RewriteCond %{HTTPS} !=on
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# Protect XMLRPC (rarely needed)
-<Files xmlrpc.php>
-Order Deny,Allow
-Deny from all
-</Files>
-<Files config/database.php>
-Order allow,deny
-Deny from all
-</Files>
-
-<FilesMatch "\.(htaccess|htpasswd)$">
+# Allow only safe file types in uploads (optional)
+<FilesMatch "\.(php|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
 Order allow,deny
 Deny from all
 </FilesMatch>
