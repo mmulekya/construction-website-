@@ -21,7 +21,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $error = "Invalid email address.";
     }
 
-    /* Check existing email */
+    // Check if email already exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
     $stmt->bind_param("s",$email);
     $stmt->execute();
@@ -34,22 +34,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $stmt->close();
 
     if(empty($error)){
-
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $token = bin2hex(random_bytes(32));
 
         $stmt = $conn->prepare(
             "INSERT INTO users (name,email,password,role,verification_token,is_verified)
-            VALUES (?,?,?,?,?,0)"
+             VALUES (?,?,?,?,?,0)"
         );
-
         $stmt->bind_param("sssss",$name,$email,$hashed_password,$role,$token);
 
         if($stmt->execute()){
-
             $verify_link = "https://yourdomain.com/verify.php?token=".$token;
             $subject = "Verify your BuildSmart account";
-            $message = "
+            $message_body = "
 Hello $name,
 
 Please verify your account by clicking the link below:
@@ -60,7 +57,7 @@ If you did not register, ignore this email.
 ";
             $headers = "From: no-reply@yourdomain.com";
 
-            mail($email,$subject,$message,$headers);
+            mail($email,$subject,$message_body,$headers);
 
             $success = "Account created! Check your email to verify your account.";
 
