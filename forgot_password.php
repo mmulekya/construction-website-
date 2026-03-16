@@ -2,8 +2,8 @@
 include("config/database.php");
 include("includes/csrf.php");
 
-$message = "";
 $error = "";
+$message = "";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
@@ -13,14 +13,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
-    $stmt = $conn->prepare("SELECT id, name FROM users WHERE email=?");
+    $stmt = $conn->prepare("SELECT id,name FROM users WHERE email=?");
     $stmt->bind_param("s",$email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if($result->num_rows == 1){
         $user = $result->fetch_assoc();
-
         $token = bin2hex(random_bytes(32));
         $expires = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
@@ -29,12 +28,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $stmt->execute();
 
         $reset_link = "https://yourdomain.com/reset_password.php?token=".$token;
-
         $subject = "Reset Your BuildSmart Password";
         $message_body = "
 Hello {$user['name']},
 
-You requested a password reset. Click the link below to reset your password:
+Click the link below to reset your password:
 
 $reset_link
 
