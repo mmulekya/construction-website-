@@ -1,55 +1,85 @@
 <?php
-require_once "includes/security.php";
-require_login();
-include("includes/header.php");
 include("config/database.php");
+include("includes/security.php");
+include("includes/csrf.php");
 
-// Only logged-in clients can post projects
-if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client'){
-    die("Access denied. Only clients can post projects.");
+$error = "";
+$success = "";
+
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
 }
 
-// Handle form submission
-if($_SERVER["REQUEST_METHOD"] === "POST"){
+if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-    $title = sanitize($_POST['title']);
-    $description = sanitize($_POST['description']);
-    $location = sanitize($_POST['location']);
-    $budget = floatval($_POST['budget']); // ensure numeric
+    if(!verify_csrf($_POST['csrf_token'])){
+        die("Invalid CSRF token");
+    }
+
+    $title = clean_input($_POST['title']);
+    $description = clean_input($_POST['description']);
+    $location = clean_input($_POST['location']);
+    $budget = floatval($_POST['budget']);
     $user_id = $_SESSION['user_id'];
 
-    // Prepare and execute insert
-    $stmt = $conn->prepare(
-        "INSERT INTO projects (title, description, location, budget, user_id) 
-        VALUES (?, ?, ?, ?, ?)"
-    );
-    $stmt->bind_param("sssdi", $title, $description, $location, $budget, $user_id);
-    $stmt->execute();
-    $stmt->close();
+    // Handle optional file upload
+    $file_path = null;
+    if(isset($_FILES['project_file']) && $_FILES['project_file']['error'] == 0){
+        $allowed_types = ['image/jpeg','image/png','application/pdf'];
+        if(!in_array($_FILES['project_file']['type'],$allowed_types)){
+            $error = "Invalid file type.";
+        } elseif($_FILES['project_file']['size'] > 5*1024*1024){
+            $error = "File too large (max 5MB).";
+        } else {
+            $file_path = 'uploads/'.basename($_FILES['project_file']['name']);
+            move_uploaded_file($_FILES['project_file']['tmp_name'],$file_path);
+        }
+    }
 
-    $success_message = "Project posted successfully!";
+    if(empty($error)){
+        $stmt = $conn->prepare("INSERT INTO projects (user_id,title,description,location,budget,file_path) VALUES (?,?,?,?,?,?)");
+        $stmt->bind_param("isssds",$user_id,$title,$description,$location,$budget,$file_path);
+        if($stmt->execute()){
+            $success = "Project posted successfully.";
+        } else {
+            $error = "Failed to post project.";
+        }
+        $stmt->close();
+    }
 }
 ?>
 
-<h2>Post a New Construction Project</h2>
+<?php include("includes/header.php"); ?>
 
-<?php if(isset($success_message)) echo "<p class='success'>".htmlspecialchars($success_message)."</p>"; ?>
+<h2>Post a New Project</h2>
 
-<form method="POST">
+<?php if(!empty($error)){ ?>
+<p style="color:red;"><?php echo e($error); ?></p>
+<?php } ?>
+<?php if(!empty($success)){ ?>
+<p style="color:green;"><?php echo e($success); ?></p>
+<?php } ?>
 
-    <label>Project Title</label>
-    <input type="text" name="title" required>
+<form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
 
-    <label>Project Description</label>
-    <textarea name="description" required></textarea>
+<label>Title</label><br>
+<input type="text" name="title" required><br><br>
 
-    <label>Project Location</label>
-    <input type="text" name="location" required value="<?php echo htmlspecialchars($_SESSION['country']); ?>">
+<label>Description</label><br>
+<textarea name="description" required></textarea><br><br>
 
-    <label>Project Budget (USD)</label>
-    <input type="number" name="budget" step="0.01" required>
+<label>Location</label><br>
+<input type="text" name="location" required><br><br>
 
-    <button type="submit">Post Project</button>
+<label>Budget (USD)</label><br>
+<input type="number" name="budget" step="0.01" required><br><br>
+
+<label>Optional File</label><br>
+<input type="file" name="project_file"><br><br>
+
+<button type="submit">Post Project</button>
 </form>
 
 <?php include("includes/footer.php"); ?>
