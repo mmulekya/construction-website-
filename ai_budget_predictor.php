@@ -1,61 +1,49 @@
 <?php
-require_once "includes/security.php";
-require_login();
-include("includes/header.php");
+include("config/database.php");
+include("includes/security.php");
+include("includes/csrf.php");
+
+check_login();
+
+$error = "";
+$budget_prediction = "";
+
+if($_SERVER["REQUEST_METHOD"] === "POST"){
+    if(!verify_csrf($_POST['csrf_token'])) die("Invalid CSRF token");
+
+    $area = floatval($_POST['area']);
+    $complexity = clean_input($_POST['complexity']);
+    $location = clean_input($_POST['location']);
+
+    if($area <= 0 || empty($complexity) || empty($location)){
+        $error = "Please provide valid input for all fields.";
+    } else {
+        // Placeholder: replace with real AI prediction
+        $budget_prediction = $area * 50 * (($complexity==="high")?1.3:1) * (($location==="UK")?1.2:1);
+    }
+}
 ?>
 
+<?php include("includes/header.php"); ?>
 <h2>AI Budget Predictor</h2>
+<?php if($error) echo "<p style='color:red;'>".e($error)."</p>"; ?>
+<?php if($budget_prediction) echo "<p>Predicted Budget: ".e(number_format($budget_prediction,2))." USD</p>"; ?>
 
 <form method="POST">
+<input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+<label>Project Area (sqm)</label><br>
+<input type="number" name="area" step="0.1" required><br><br>
 
-<label>Describe Your Construction Project</label><br>
-<textarea name="description" rows="6" cols="50" required></textarea>
+<label>Complexity</label><br>
+<select name="complexity" required>
+    <option value="low">Low</option>
+    <option value="medium">Medium</option>
+    <option value="high">High</option>
+</select><br><br>
 
-<br><br>
+<label>Location</label><br>
+<input type="text" name="location" required><br><br>
 
 <button type="submit">Predict Budget</button>
-
 </form>
-
-<?php
-
-if($_SERVER["REQUEST_METHOD"]=="POST"){
-
-$description = strtolower(sanitize($_POST['description']));
-
-$estimated_budget = 0;
-
-/* Simple AI keyword logic */
-
-if(strpos($description,"house")!==false){
-$estimated_budget += 80000;
-}
-
-if(strpos($description,"apartment")!==false){
-$estimated_budget += 120000;
-}
-
-if(strpos($description,"office")!==false){
-$estimated_budget += 150000;
-}
-
-if(strpos($description,"renovation")!==false){
-$estimated_budget += 30000;
-}
-
-if(strpos($description,"garage")!==false){
-$estimated_budget += 15000;
-}
-
-/* default if nothing matched */
-
-if($estimated_budget==0){
-$estimated_budget = 50000;
-}
-
-echo "<h3>AI Estimated Budget</h3>";
-echo "<p>Estimated construction budget: <b>$".$estimated_budget."</b></p>";
-}
-
-include("includes/footer.php");
-?>
+<?php include("includes/footer.php"); ?>
