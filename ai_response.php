@@ -1,30 +1,23 @@
 <?php
-include("includes/header.php");
+include("config/database.php");
+include("includes/security.php");
 
-$question = htmlspecialchars(trim($_POST['question']));
+check_login();
 
-$answer = "Sorry, I cannot answer that yet.";
-
-if(stripos($question,"foundation")!==false){
-$answer = "A strong foundation is critical. Common types include strip foundations and raft foundations depending on soil conditions.";
-}
-
-elseif(stripos($question,"cement")!==false){
-$answer = "Cement is used for concrete. The typical mix ratio for structural concrete is 1:2:4 (cement:sand:aggregate).";
-}
-
-elseif(stripos($question,"cost")!==false){
-$answer = "Construction costs depend on location, materials, and design. Use our AI Cost Calculator for an estimate.";
-}
-
+// Fetch latest AI responses for this user
+$stmt = $conn->prepare("SELECT * FROM ai_responses WHERE user_id=? ORDER BY created_at DESC LIMIT 20");
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$responses = [];
+while($row = $result->fetch_assoc()) $responses[] = $row;
+$stmt->close();
 ?>
 
-<h2>Your Question</h2>
-<p><?php echo $question; ?></p>
-
-<h2>AI Answer</h2>
-<p><?php echo $answer; ?></p>
-
-<a href="ai_chat.php">Ask Another Question</a>
-
+<?php include("includes/header.php"); ?>
+<h2>AI Responses</h2>
+<?php if(empty($responses)) echo "<p>No AI responses yet.</p>"; ?>
+<?php foreach($responses as $r){ ?>
+<p><b><?php echo e($r['title']); ?>:</b> <?php echo e($r['response']); ?></p>
+<?php } ?>
 <?php include("includes/footer.php"); ?>
