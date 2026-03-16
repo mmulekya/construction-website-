@@ -53,7 +53,7 @@ if(isset($_GET['token'])){
 <p><a href="login.php">Go to Login</a></p>
 <?php } ?>
 
-<?php if(empty($success) && empty($error) || !empty($user)){ ?>
+<?php if(empty($success) && (empty($error) || !empty($user))){ ?>
 <form method="POST">
 <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
 <label>New Password</label><br>
