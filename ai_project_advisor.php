@@ -1,82 +1,38 @@
 <?php
-require_once "includes/security.php";
-require_login();
-include("includes/header.php");
+include("config/database.php");
+include("includes/security.php");
+include("includes/csrf.php");
+
+check_login();
+
+$error = "";
+$advice = [];
+
+if($_SERVER["REQUEST_METHOD"]==="POST"){
+    if(!verify_csrf($_POST['csrf_token'])) die("Invalid CSRF token");
+
+    $budget = floatval($_POST['budget']);
+    if($budget<=0) $error="Enter valid budget.";
+    else $advice = [
+        "Hire certified contractors",
+        "Prioritize critical tasks first",
+        "Use cost-effective materials"
+    ];
+}
 ?>
 
-<h2>AI Smart Project Advisor</h2>
-
-<form method="POST" action="ai_project_advisor.php">
-
-<label>Project Type</label>
-<select name="project_type" required>
-<option value="house">House</option>
-<option value="apartment">Apartment</option>
-<option value="office">Office</option>
-<option value="renovation">Renovation</option>
-</select>
-
-<br><br>
-
-<label>Project Size (square meters)</label>
-<input type="number" name="size" required>
-
-<br><br>
-
-<label>Location</label>
-<input type="text" name="location" required>
-
-<br><br>
-
-<button type="submit">Get AI Advice</button>
-
+<?php include("includes/header.php"); ?>
+<h2>AI Project Advisor</h2>
+<?php if($error) echo "<p style='color:red;'>".e($error)."</p>"; ?>
+<?php if($advice){ ?>
+<ul>
+<?php foreach($advice as $a) echo "<li>".e($a)."</li>"; ?>
+</ul>
+<?php } ?>
+<form method="POST">
+<input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+<label>Project Budget (USD)</label><br>
+<input type="number" name="budget" step="0.01" required><br><br>
+<button type="submit">Get Advice</button>
 </form>
-
-<?php
-
-if($_SERVER["REQUEST_METHOD"]=="POST"){
-
-$project_type = sanitize($_POST['project_type']);
-$size = intval($_POST['size']);
-$location = sanitize($_POST['location']);
-
-/* Basic AI logic */
-
-$cost_per_m2 = 500;
-
-if($project_type=="apartment"){
-$cost_per_m2 = 650;
-}
-
-if($project_type=="office"){
-$cost_per_m2 = 700;
-}
-
-if($project_type=="renovation"){
-$cost_per_m2 = 300;
-}
-
-$estimated_cost = $size * $cost_per_m2;
-
-$estimated_time = round($size / 50) . " months";
-
-/* Constructor suggestion */
-
-$constructor_type = "General Contractor";
-
-if($project_type=="office"){
-$constructor_type = "Commercial Construction Company";
-}
-
-if($project_type=="renovation"){
-$constructor_type = "Renovation Specialist";
-}
-
-echo "<h3>AI Recommendation</h3>";
-echo "<p><b>Estimated Cost:</b> $" . $estimated_cost . "</p>";
-echo "<p><b>Estimated Duration:</b> " . $estimated_time . "</p>";
-echo "<p><b>Recommended Constructor:</b> " . $constructor_type . "</p>";
-}
-
-include("includes/footer.php");
-?>
+<?php include("includes/footer.php"); ?>
