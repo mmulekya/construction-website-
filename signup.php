@@ -1,41 +1,98 @@
 <?php
+
+include("config/database.php");
 include("includes/security.php");
-include("includes/header.php");
+include("includes/csrf.php");
+
+$error = "";
+$success = "";
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+/* Verify CSRF token */
+if(!verify_csrf($_POST['csrf_token'])){
+die("Invalid CSRF token");
+}
+
+$name = clean_input($_POST['name']);
+$email = clean_input($_POST['email']);
+$password = $_POST['password'];
+$role = clean_input($_POST['role']);
+
+/* Validate email */
+if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+$error = "Invalid email address.";
+}
+
+/* Check if email already exists */
+$stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
+$stmt->bind_param("s",$email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if($result->num_rows > 0){
+$error = "Email already registered.";
+}
+
+$stmt->close();
+
+if(empty($error)){
+
+/* Hash password */
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+$stmt = $conn->prepare(
+"INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)"
+);
+
+$stmt->bind_param("ssss",$name,$email,$hashed_password,$role);
+
+if($stmt->execute()){
+$success = "Account created successfully. You can now login.";
+}else{
+$error = "Registration failed.";
+}
+
+$stmt->close();
+
+}
+
+}
+
 ?>
 
-<h2>Create Account</h2>
+<?php include("includes/header.php"); ?>
 
-<form action="register_process.php" method="POST">
+<h2>Signup</h2>
 
-<label>Name</label>
-<input type="text" name="name" required>
+<?php if(!empty($error)){ ?>
+<p style="color:red;"><?php echo e($error); ?></p>
+<?php } ?>
 
-<label>Email</label>
-<input type="email" name="email" required>
+<?php if(!empty($success)){ ?>
+<p style="color:green;"><?php echo e($success); ?></p>
+<?php } ?>
 
-<label>Password</label>
-<input type="password" name="password" required>
+<form method="POST">
 
-<label>Account Type</label>
+<input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+
+<label>Name</label><br>
+<input type="text" name="name" required><br><br>
+
+<label>Email</label><br>
+<input type="email" name="email" required><br><br>
+
+<label>Password</label><br>
+<input type="password" name="password" required><br><br>
+
+<label>Account Type</label><br>
 <select name="role" required>
 <option value="client">Client</option>
 <option value="constructor">Constructor</option>
-</select>
+</select><br><br>
 
-<label>Country</label>
-<select name="country" required>
-
-<option value="Kenya">Kenya</option>
-<option value="Tanzania">Tanzania</option>
-<option value="Uganda">Uganda</option>
-<option value="Rwanda">Rwanda</option>
-<option value="USA">United States</option>
-<option value="UK">United Kingdom</option>
-<option value="India">India</option>
-
-</select>
-
-<button type="submit">Register</button>
+<button type="submit">Create Account</button>
 
 </form>
 
