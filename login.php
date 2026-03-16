@@ -27,14 +27,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if($result->num_rows == 1){
         $user = $result->fetch_assoc();
 
-        /* Verify password */
         if(password_verify($password, $user['password'])){
 
-            /* Check if email is verified */
             if($user['is_verified'] == 0){
                 $error = "Please verify your email before logging in.";
             }else{
-                /* Login success */
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['role'] = $user['role'];
                 header("Location: dashboard.php");
@@ -42,13 +39,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             }
 
         }else{
-            /* Wrong password */
             record_login_attempt($conn);
             $error = "Invalid email or password.";
         }
 
     }else{
-        /* User not found */
         record_login_attempt($conn);
         $error = "Invalid email or password.";
     }
@@ -66,7 +61,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php } ?>
 
 <form method="POST">
-
     <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
 
     <label>Email</label><br>
@@ -76,7 +70,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <input type="password" name="password" required><br><br>
 
     <button type="submit">Login</button>
-
 </form>
 
 <p><a href="forgot_password.php">Forgot Password?</a></p>
