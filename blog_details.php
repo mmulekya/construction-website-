@@ -1,26 +1,20 @@
 <?php
-include("includes/header.php");
-include("includes/auth.php");
 include("config/database.php");
+include("includes/security.php");
 
-$id = $_GET['id'];
+$post_id = intval($_GET['id'] ?? 0);
+if($post_id <= 0) die("Invalid post ID");
 
-$sql = "SELECT blog_posts.*, users.name AS author 
-        FROM blog_posts 
-        JOIN users ON blog_posts.author_id = users.id
-        WHERE blog_posts.id='$id'";
+$stmt = $conn->prepare("SELECT * FROM blog_posts WHERE id=? LIMIT 1");
+$stmt->bind_param("i",$post_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$post = $result->fetch_assoc();
+$stmt->close();
+if(!$post) die("Post not found");
 
-$result = mysqli_query($conn,$sql);
-$post = mysqli_fetch_assoc($result);
+include("includes/header.php"); 
 ?>
-
-<h2><?php echo htmlspecialchars($post['title']); ?></h2>
-<p>By <?php echo htmlspecialchars($post['author']); ?> | <?php echo $post['created_at']; ?></p>
-<?php if($post['image']){ ?>
-<img src="uploads/<?php echo $post['image']; ?>" width="400">
-<?php } ?>
-<p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
-
-<a href="blog.php">Back to Knowledge Hub</a>
-
+<h2><?php echo e($post['title']); ?></h2>
+<p><?php echo e($post['content']); ?></p>
 <?php include("includes/footer.php"); ?>
