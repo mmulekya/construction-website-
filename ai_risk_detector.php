@@ -1,70 +1,41 @@
 <?php
-require_once "includes/security.php";
-require_login();
-include("includes/header.php");
+include("config/database.php");
+include("includes/security.php");
+include("includes/csrf.php");
+
+check_login();
+
+$error = "";
+$risks = [];
+
+if($_SERVER["REQUEST_METHOD"]==="POST"){
+    if(!verify_csrf($_POST['csrf_token'])) die("Invalid CSRF token");
+
+    $project_type = clean_input($_POST['project_type']);
+    $budget = floatval($_POST['budget']);
+    if(empty($project_type) || $budget<=0) $error="Provide valid inputs.";
+    else $risks = [
+        "Budget overrun risk",
+        "Delay in material delivery",
+        "Insufficient labor allocation"
+    ];
+}
 ?>
 
-<h2>AI Project Risk Detector</h2>
-
+<?php include("includes/header.php"); ?>
+<h2>AI Risk Detector</h2>
+<?php if($error) echo "<p style='color:red;'>".e($error)."</p>"; ?>
+<?php if($risks){ ?>
+<ul>
+<?php foreach($risks as $risk) echo "<li>".e($risk)."</li>"; ?>
+</ul>
+<?php } ?>
 <form method="POST">
-
-<label>Describe Your Construction Project</label><br>
-<textarea name="description" rows="6" cols="50" required></textarea>
-
-<br><br>
-
-<button type="submit">Analyze Risk</button>
-
+<input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+<label>Project Type</label><br>
+<input type="text" name="project_type" required><br><br>
+<label>Budget (USD)</label><br>
+<input type="number" name="budget" step="0.01" required><br><br>
+<button type="submit">Detect Risks</button>
 </form>
-
-<?php
-
-if($_SERVER["REQUEST_METHOD"]=="POST"){
-
-$description = strtolower(sanitize($_POST['description']));
-
-$risk_level = "Low";
-$warnings = [];
-
-/* Risk detection rules */
-
-if(strpos($description,"skyscraper")!==false){
-$risk_level = "High";
-$warnings[] = "Very complex project structure.";
-}
-
-if(strpos($description,"large")!==false){
-$risk_level = "Medium";
-$warnings[] = "Large project may increase construction time.";
-}
-
-if(strpos($description,"basement")!==false){
-$warnings[] = "Basement construction may increase cost.";
-}
-
-if(strpos($description,"city center")!==false){
-$warnings[] = "Urban construction may face permit delays.";
-}
-
-if(strpos($description,"cheap")!==false){
-$warnings[] = "Low budget may reduce material quality.";
-}
-
-echo "<h3>AI Risk Analysis</h3>";
-
-echo "<p><b>Risk Level:</b> ".$risk_level."</p>";
-
-if(!empty($warnings)){
-echo "<ul>";
-foreach($warnings as $w){
-echo "<li>".$w."</li>";
-}
-echo "</ul>";
-}else{
-echo "<p>No major risks detected.</p>";
-}
-
-}
-
-include("includes/footer.php");
-?>
+<?php include("includes/footer.php"); ?>
