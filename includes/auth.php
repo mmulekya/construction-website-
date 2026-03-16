@@ -1,7 +1,7 @@
 <?php
 include_once "security.php";
 
-/* Require login */
+/* Require authentication */
 function require_auth(){
     if(!isset($_SESSION['user_id'])){
         header("Location: login.php");
@@ -9,7 +9,7 @@ function require_auth(){
     }
 }
 
-/* Require admin */
+/* Require admin role */
 function require_admin(){
     if(!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin'){
         die("Access denied.");
