@@ -1,44 +1,41 @@
+<?php
+include_once "security.php";
+
+/* Security headers */
+header("X-Frame-Options: SAMEORIGIN");
+header("X-XSS-Protection: 1; mode=block");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>BuildSmart | Find Professional Constructors Worldwide</title>
-
-<meta name="description" content="BuildSmart connects clients with professional constructors worldwide. Get building advice, cost estimates, and hire trusted builders.">
-
-<meta name="keywords" content="construction, builders, contractors, house construction, building cost, hire constructor">
-
-<meta name="author" content="BuildSmart">
-
-<link rel="stylesheet" href="css/style.css">
-
+<title>BuildSmart</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>
-
 <h1>BuildSmart</h1>
 
 <nav>
 <a href="index.php">Home</a>
 <a href="projects.php">Projects</a>
 <a href="constructors.php">Constructors</a>
-<a href="ai_budget_predictor.php">AI Budget Predictor</a>
-<a href="ai_estimator.php">AI Tools</a>
-<a href="ai_project_advisor.php">AI Project Advisor</a>
+
+<?php if(is_logged_in()) { ?>
 <a href="dashboard.php">Dashboard</a>
 <a href="profile.php">Profile</a>
 <a href="logout.php">Logout</a>
+<?php } else { ?>
+<a href="login.php">Login</a>
+<a href="signup.php">Signup</a>
+<?php } ?>
+
 </nav>
-
-<form action="search.php" method="GET" style="display:inline;">
-<input type="text" name="q" placeholder="Search..." required>
-<button type="submit">🔎</button>
-</form>
-
-
 </header>
+
+<div class="container">
