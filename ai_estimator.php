@@ -1,31 +1,75 @@
 <?php
-include("includes/header.php");
+include("config/database.php");
+include("includes/security.php");
+include("includes/csrf.php");
 
-$size = intval($_POST['size']);
-$floors = intval($_POST['floors']);
-$quality = htmlspecialchars($_POST['quality']);
+check_login(); // ensure user is logged in
 
-$cost_per_m2 = 500;
+$error = "";
+$estimate_result = "";
 
-if($quality=="medium"){
-$cost_per_m2 = 800;
+if($_SERVER["REQUEST_METHOD"] == "POST") {
+    if(!verify_csrf($_POST['csrf_token'])){
+        die("Invalid CSRF token");
+    }
+
+    $area = floatval($_POST['area']);
+    $materials = clean_input($_POST['materials']);
+    $complexity = clean_input($_POST['complexity']);
+    $location = clean_input($_POST['location']);
+
+    if($area <= 0 || empty($materials) || empty($complexity) || empty($location)){
+        $error = "Please fill all fields correctly.";
+    } else {
+        // Placeholder for AI API integration
+        // $estimate_result = callAIEstimateAPI($area, $materials, $complexity, $location);
+
+        // For demo, using formula
+        $base_cost = 50; // per sqm
+        $material_multiplier = ($materials === "premium") ? 1.5 : 1;
+        $complexity_multiplier = ($complexity === "high") ? 1.3 : 1;
+        $location_multiplier = ($location === "UK") ? 1.2 : 1;
+
+        $estimate_result = $area * $base_cost * $material_multiplier * $complexity_multiplier * $location_multiplier;
+    }
 }
-
-if($quality=="luxury"){
-$cost_per_m2 = 1200;
-}
-
-$total_cost = $size * $floors * $cost_per_m2;
 ?>
 
-<h2>Estimated Construction Cost</h2>
+<?php include("includes/header.php"); ?>
 
-<p>House Size: <?php echo $size; ?> m²</p>
-<p>Floors: <?php echo $floors; ?></p>
-<p>Quality: <?php echo $quality; ?></p>
+<h2>AI Project Cost Estimator</h2>
 
-<h3>Total Estimated Cost: $<?php echo number_format($total_cost); ?></h3>
+<?php if(!empty($error)) { ?>
+<p style="color:red;"><?php echo e($error); ?></p>
+<?php } ?>
 
-<a href="ai_cost_calculator.php">Calculate Again</a>
+<?php if(!empty($estimate_result)) { ?>
+<p>Estimated Project Cost: <?php echo e(number_format($estimate_result,2)); ?> USD</p>
+<?php } ?>
+
+<form method="POST">
+<input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+
+<label>Project Area (sqm)</label><br>
+<input type="number" name="area" step="0.1" required><br><br>
+
+<label>Materials</label><br>
+<select name="materials" required>
+    <option value="standard">Standard</option>
+    <option value="premium">Premium</option>
+</select><br><br>
+
+<label>Complexity</label><br>
+<select name="complexity" required>
+    <option value="low">Low</option>
+    <option value="medium">Medium</option>
+    <option value="high">High</option>
+</select><br><br>
+
+<label>Location</label><br>
+<input type="text" name="location" required><br><br>
+
+<button type="submit">Get Estimate</button>
+</form>
 
 <?php include("includes/footer.php"); ?>
