@@ -6,12 +6,10 @@ include("includes/bruteforce_protection.php");
 
 $error = "";
 
-/* Check login attempts first */
 check_login_attempts($conn);
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-    /* Verify CSRF token */
     if(!verify_csrf($_POST['csrf_token'])){
         die("Invalid CSRF token");
     }
@@ -20,7 +18,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $password = $_POST['password'];
 
     $stmt = $conn->prepare("SELECT id, password, role, is_verified FROM users WHERE email=?");
-    $stmt->bind_param("s", $email);
+    $stmt->bind_param("s",$email);
     $stmt->execute();
     $result = $stmt->get_result();
 
