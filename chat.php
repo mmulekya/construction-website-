@@ -1,67 +1,91 @@
 <?php
-require_once "includes/security.php";
-require_login();
-include("includes/header.php");
+include("config/database.php");
+include("includes/security.php");
+include("includes/csrf.php");
 
-$receiver_id = intval($_GET['user_id']);
+if(!isset($_SESSION['user_id'])){
+    header("Location: login.php");
+    exit();
+}
+
+$error = "";
+
+// Handle new message
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+
+    if(!verify_csrf($_POST['csrf_token'])){
+        die("Invalid CSRF token");
+    }
+
+    $receiver_id = intval($_POST['receiver_id']);
+    $message_text = clean_input($_POST['message']);
+
+    if(empty($message_text)){
+        $error = "Message cannot be empty.";
+    }
+
+    // Optional: simple spam check, e.g., message length or repeated messages
+    if(strlen($message_text) > 2000){
+        $error = "Message too long.";
+    }
+
+    if(empty($error)){
+        $stmt = $conn->prepare("INSERT INTO messages (sender_id,receiver_id,message,created_at) VALUES (?,?,?,NOW())");
+        $stmt->bind_param("iis", $_SESSION['user_id'], $receiver_id, $message_text);
+        if(!$stmt->execute()){
+            $error = "Failed to send message.";
+        }
+        $stmt->close();
+    }
+}
+
+// Fetch recent messages between user and selected receiver
+$receiver_id = isset($_GET['user']) ? intval($_GET['user']) : 0;
+
+$messages = [];
+if($receiver_id > 0){
+    $stmt = $conn->prepare("
+        SELECT m.*, u.name as sender_name 
+        FROM messages m 
+        JOIN users u ON m.sender_id=u.id
+        WHERE (sender_id=? AND receiver_id=?) OR (sender_id=? AND receiver_id=?)
+        ORDER BY created_at ASC
+    ");
+    $stmt->bind_param("iiii", $_SESSION['user_id'],$receiver_id,$receiver_id,$_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while($row = $result->fetch_assoc()){
+        $messages[] = $row;
+    }
+    $stmt->close();
+}
+
 ?>
+
+<?php include("includes/header.php"); ?>
 
 <h2>Chat</h2>
 
-<div id="chat-box" style="border:1px solid #ccc;height:300px;overflow-y:scroll;padding:10px;"></div>
+<?php if(!empty($error)){ ?>
+<p style="color:red;"><?php echo e($error); ?></p>
+<?php } ?>
 
-<form id="chat-form">
+<?php if($receiver_id > 0){ ?>
+<div class="chat-box">
+    <?php foreach($messages as $msg){ ?>
+        <p><b><?php echo htmlspecialchars($msg['sender_name']); ?>:</b> <?php echo htmlspecialchars($msg['message']); ?></p>
+    <?php } ?>
+</div>
 
-<input type="hidden" id="receiver_id" value="<?php echo $receiver_id; ?>">
-
-<input type="text" id="message" placeholder="Type message..." required>
-
-<button type="submit">Send</button>
-
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="<?php echo csrf_token(); ?>">
+    <input type="hidden" name="receiver_id" value="<?php echo $receiver_id; ?>">
+    <textarea name="message" required placeholder="Type your message here..."></textarea><br><br>
+    <button type="submit">Send</button>
 </form>
 
-<script>
-
-function loadMessages(){
-
-let receiver=document.getElementById("receiver_id").value;
-
-fetch("fetch_messages.php?receiver_id="+receiver)
-.then(res=>res.text())
-.then(data=>{
-document.getElementById("chat-box").innerHTML=data;
-});
-
-}
-
-setInterval(loadMessages,2000); // refresh every 2 seconds
-
-document.getElementById("chat-form").addEventListener("submit",function(e){
-
-e.preventDefault();
-
-let msg=document.getElementById("message").value;
-let receiver=document.getElementById("receiver_id").value;
-
-fetch("send_message.php",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/x-www-form-urlencoded"
-},
-
-body:"message="+encodeURIComponent(msg)+"&receiver_id="+receiver
-
-}).then(()=>{
-document.getElementById("message").value="";
-loadMessages();
-});
-
-});
-
-loadMessages();
-
-</script>
+<?php } else { ?>
+<p>Select a user to start chatting.</p>
+<?php } ?>
 
 <?php include("includes/footer.php"); ?>
